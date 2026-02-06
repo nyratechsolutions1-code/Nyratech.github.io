@@ -669,6 +669,40 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+<style>
+  /* Phone preview styling */
+  #previewPhone {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 360px;
+    height: 720px;
+    background: #fff;
+    border-radius: 30px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+    overflow: hidden;
+    display: none;
+    z-index: 9999;
+  }
+  #previewPhone .controls {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    z-index: 10001;
+  }
+  #previewPhone .controls button {
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: none;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  #previewPhone iframe { width:100%; height:100%; border:0; }
+  /* Hide preview on very small screens to avoid blocking content */
+  @media (max-width: 600px) { #previewPhone { display:none !important; } }
+</style>
+
 <script>
 // List of sample-sites folders (enumerated from the repository)
 const sampleFolders = [
@@ -714,43 +748,53 @@ const sampleFolders = [
   "NYRA_medic_care"
 ];
 
-// Helper to make a readable title from folder name
 function titleFromFolder(name) {
-  return name
-    .replace(/[_-]+/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase())
-    .replace(/Nyra\b/i, 'NYRA ')
-    .trim();
+  return name.replace(/[_-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim();
 }
-
-// Common candidate image paths to try for each folder
-const imageCandidates = folder => [
-  `sample-sites/${folder}/assets/img/hero.jpg`,
-  `sample-sites/${folder}/assets/img/banner-img.png`,
-  `sample-sites/${folder}/images/banner-img.png`,
-  `sample-sites/${folder}/images/hero.jpg`,
-  `sample-sites/${folder}/assets/img/hero.png`,
-  `sample-sites/${folder}/assets/img/banner.jpg`,
-  `sample-sites/${folder}/assets/img/hero.png`,
-  `sample-sites/${folder}/assets/img/hero.webp`
-];
 
 const container = document.getElementById("samplesContainer");
 
-// Build entries and render
+// create preview panel
+const preview = document.createElement('div');
+preview.id = 'previewPhone';
+preview.innerHTML = `
+  <div class="controls"><button id="closePreview">Close</button></div>
+  <iframe id="previewFrame" src="about:blank" title="Preview"></iframe>
+`;
+document.body.appendChild(preview);
+const previewFrame = preview.querySelector('#previewFrame');
+const closeBtn = preview.querySelector('#closePreview');
+closeBtn.addEventListener('click', () => {
+  preview.style.display = 'none';
+  previewFrame.src = 'about:blank';
+});
+
 sampleFolders.forEach(folder => {
-  const col = document.createElement("div");
-  col.className = "col-md-6 col-lg-4";
+  const col = document.createElement('div');
+  col.className = 'col-md-6 col-lg-4';
 
   const card = document.createElement('div');
   card.className = 'card h-100';
+  // create a small embedded iframe in the card so users can scroll inside the card
+  const iframeWrap = document.createElement('div');
+  iframeWrap.style.height = '360px';
+  iframeWrap.style.overflow = 'hidden';
+  iframeWrap.style.background = '#ffffff';
 
-  const img = document.createElement('img');
-  img.className = 'card-img-top';
-  img.alt = titleFromFolder(folder);
+  const miniFrame = document.createElement('iframe');
+  miniFrame.className = 'card-iframe';
+  miniFrame.src = `sample-sites/${folder}/index.html`;
+  miniFrame.loading = 'lazy';
+  miniFrame.style.width = '100%';
+  miniFrame.style.height = '100%';
+  miniFrame.style.border = '0';
+  // allow basic interaction inside iframe; adjust sandbox as needed
+  // remove sandbox to allow full functionality for local demos
+
+  iframeWrap.appendChild(miniFrame);
 
   const body = document.createElement('div');
-  body.className = 'card-body';
+  body.className = 'card-body d-flex flex-column justify-content-between';
 
   const h5 = document.createElement('h5');
   h5.className = 'card-title';
@@ -758,42 +802,38 @@ sampleFolders.forEach(folder => {
 
   const p = document.createElement('p');
   p.className = 'card-text';
-  p.textContent = `Sample website: ${titleFromFolder(folder)} — demo adapted for NYRA TECH Solutions.`;
+  p.textContent = `${titleFromFolder(folder)} — demo adapted for NYRA TECH Solutions.`;
 
-  const a = document.createElement('a');
-  a.className = 'btn btn-primary';
-  a.textContent = 'View Project';
-  a.href = `sample-sites/${folder}/index.html`;
+  const btnGroup = document.createElement('div');
+  btnGroup.className = 'd-flex gap-2';
+
+  const openBtn = document.createElement('a');
+  openBtn.className = 'btn btn-outline-primary';
+  openBtn.textContent = 'Open';
+  openBtn.href = `sample-sites/${folder}/index.html`;
+  openBtn.target = '_blank';
+
+  const previewBtn = document.createElement('button');
+  previewBtn.className = 'btn btn-primary';
+  previewBtn.textContent = 'Preview';
+  previewBtn.type = 'button';
+  previewBtn.addEventListener('click', () => {
+    previewFrame.src = `sample-sites/${folder}/index.html`;
+    preview.style.display = 'block';
+  });
+
+  btnGroup.appendChild(openBtn);
+  btnGroup.appendChild(previewBtn);
 
   body.appendChild(h5);
   body.appendChild(p);
-  body.appendChild(a);
+  body.appendChild(btnGroup);
 
-  card.appendChild(img);
+  // assemble card: place iframe on top then body
+  card.appendChild(iframeWrap);
   card.appendChild(body);
   col.appendChild(card);
   container.appendChild(col);
-
-  // Try candidates in sequence and set first that loads
-  const candidates = imageCandidates(folder);
-  let idx = 0;
-  function tryNext() {
-    if (idx >= candidates.length) {
-      // No image found — hide the img element
-      img.style.display = 'none';
-      return;
-    }
-    const candidate = candidates[idx++];
-    const tester = new Image();
-    tester.onload = function() {
-      img.src = candidate;
-    };
-    tester.onerror = function() {
-      tryNext();
-    };
-    tester.src = candidate;
-  }
-  tryNext();
 });
 </script>
 </body>
