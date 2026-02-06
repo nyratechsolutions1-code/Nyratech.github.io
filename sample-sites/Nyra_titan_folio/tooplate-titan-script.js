@@ -2,7 +2,7 @@
 
 Tooplate 2147 Titan Folio
 
-https://www.tooplate.com/view/2147-titan-folio
+https://www.nyratechsolutions.com/view/2147-titan-folio
 */
 
 
