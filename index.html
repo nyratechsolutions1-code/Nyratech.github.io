@@ -460,24 +460,6 @@
 
     </section><!-- /Alt Services Section -->
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <!-- Contact Section -->
 
     <section id="contact" class="contact section">
@@ -543,7 +525,7 @@
                   <input type="text" class="form-control" name="company" placeholder="Company">
                 </div>
 
-                <div class="col-12">
+                <div class="col-12>
                   <input type="email" class="form-control" name="email" placeholder="Email Address" required="">
                 </div>
 
@@ -581,111 +563,19 @@
 
     </section><!-- /Contact Section -->
 
-    <!-- Our Sample Works Section -->
-    <section id="our-samples" class="section">
+   <section id="our-samples" class="section">
       <div class="container section-title" data-aos="fade-up">
         <h2>Our Sample Works</h2>
         <p>Explore a selection of sample websites and templates we maintain for demos and quick previews.</p>
       </div>
+
       <div class="container" data-aos="fade-up">
-        <div class="row gy-4">
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <img src="sample-sites/NYRATECH-Profusion/../Nyrafusion/images/banner-img.png" class="card-img-top" alt="Profusion Preview" onerror="this.style.display='none'">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - Profusion</h5>
-                <p class="card-text">Creative agency / dance studio template — demo adapted for NYRA TECH Solutions.</p>
-                <a href="sample-sites/NYRATECH-Profusion/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <img src="sample-sites/NYRATECH-Feane/../Nyrafoods/images/hero-bg.jpg" class="card-img-top" alt="Feane Preview" onerror="this.style.display='none'">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - Feane</h5>
-                <p class="card-text">Restaurant / food ordering template sample for menu and booking demonstrations.</p>
-                <a href="sample-sites/NYRATECH-Feane/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <img src="sample-sites/NYRATECH-PurpleBuzz/../Nyra_buzz/assets/img/hero.jpg" class="card-img-top" alt="Purple Buzz Preview" onerror="this.style.display='none'">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - PurpleBuzz</h5>
-                <p class="card-text">Portfolio and creative template included as a sample project for showcases.</p>
-                <a href="sample-sites/NYRATECH-PurpleBuzz/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Additional sample cards -->
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - ZayShop</h5>
-                <p class="card-text">E-commerce demo template for shop and product layout previews.</p>
-                <a href="sample-sites/NYRATECH-ZayShop/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - KlassyCafe</h5>
-                <p class="card-text">Cafe / restaurant template sample for menu and reservation UI previews.</p>
-                <a href="sample-sites/NYRATECH-KlassyCafe/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - SpaceDynamic</h5>
-                <p class="card-text">SEO & marketing template sample for campaign and landing page previews.</p>
-                <a href="sample-sites/NYRATECH-SpaceDynamic/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - EduMeeting</h5>
-                <p class="card-text">Education & meeting template sample for webinar and event demos.</p>
-                <a href="sample-sites/NYRATECH-EduMeeting/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - MedicCare</h5>
-                <p class="card-text">Healthcare template sample for appointment and services UI previews.</p>
-                <a href="sample-sites/NYRATECH-MedicCare/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4">
-            <div class="card h-100">
-              <div class="card-body">
-                <h5 class="card-title">NYRA TECH - SEODream</h5>
-                <p class="card-text">SEO & digital marketing template sample for promotional previews.</p>
-                <a href="sample-sites/NYRATECH-SEODream/index.html" class="btn btn-primary">View Project</a>
-              </div>
-            </div>
-          </div>
-
+        <div class="row gy-4" id="samplesContainer">
+          <!-- Cards will be injected here by JS -->
         </div>
       </div>
     </section>
+
 
   </main>
 
@@ -779,7 +669,133 @@
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+<script>
+// List of sample-sites folders (enumerated from the repository)
+const sampleFolders = [
+  "Nyraaerial",
+  "Nyraalpha",
+  "Nyradimension",
+  "Nyradirective",
+  "Nyraeditorial",
+  "Nyraescape-velocity",
+  "Nyraethereal",
+  "Nyrafoods",
+  "Nyraforty",
+  "Nyrafractal",
+  "Nyrafuture-imperfect",
+  "Nyrahyperspace",
+  "Nyralanded",
+  "Nyralens",
+  "Nyramassively",
+  "Nyramultiverse",
+  "Nyraparadigm-shift",
+  "Nyraparallelism",
+  "Nyraphantom",
+  "Nyraphoton",
+  "Nyrapicture",
+  "Nyrasolid-state",
+  "Nyraspectral",
+  "Nyrastellar",
+  "Nyrastrongly-typed",
+  "Nyratwenty",
+  "Nyra_buzz",
+  "Nyra_cafe",
+  "Nyra_dynamic",
+  "Nyra_eco_lume",
+  "Nyra_edu_meeting",
+  "Nyra_event_invitation",
+  "Nyra_graphite_creative",
+  "Nyra_living_parallax",
+  "Nyra_seo_dream",
+  "Nyra_titan_folio",
+  "Nyra_winter_gallery",
+  "Nyrafusion",
+  "NYRA_shop",
+  "NYRA_medic_care"
+];
 
+// Helper to make a readable title from folder name
+function titleFromFolder(name) {
+  return name
+    .replace(/[_-]+/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
+    .replace(/Nyra\b/i, 'NYRA ')
+    .trim();
+}
+
+// Common candidate image paths to try for each folder
+const imageCandidates = folder => [
+  `sample-sites/${folder}/assets/img/hero.jpg`,
+  `sample-sites/${folder}/assets/img/banner-img.png`,
+  `sample-sites/${folder}/images/banner-img.png`,
+  `sample-sites/${folder}/images/hero.jpg`,
+  `sample-sites/${folder}/assets/img/hero.png`,
+  `sample-sites/${folder}/assets/img/banner.jpg`,
+  `sample-sites/${folder}/assets/img/hero.png`,
+  `sample-sites/${folder}/assets/img/hero.webp`
+];
+
+const container = document.getElementById("samplesContainer");
+
+// Build entries and render
+sampleFolders.forEach(folder => {
+  const col = document.createElement("div");
+  col.className = "col-md-6 col-lg-4";
+
+  const card = document.createElement('div');
+  card.className = 'card h-100';
+
+  const img = document.createElement('img');
+  img.className = 'card-img-top';
+  img.alt = titleFromFolder(folder);
+
+  const body = document.createElement('div');
+  body.className = 'card-body';
+
+  const h5 = document.createElement('h5');
+  h5.className = 'card-title';
+  h5.textContent = `NYRA TECH - ${titleFromFolder(folder)}`;
+
+  const p = document.createElement('p');
+  p.className = 'card-text';
+  p.textContent = `Sample website: ${titleFromFolder(folder)} — demo adapted for NYRA TECH Solutions.`;
+
+  const a = document.createElement('a');
+  a.className = 'btn btn-primary';
+  a.textContent = 'View Project';
+  a.href = `sample-sites/${folder}/index.html`;
+
+  body.appendChild(h5);
+  body.appendChild(p);
+  body.appendChild(a);
+
+  card.appendChild(img);
+  card.appendChild(body);
+  col.appendChild(card);
+  container.appendChild(col);
+
+  // Try candidates in sequence and set first that loads
+  const candidates = imageCandidates(folder);
+  let idx = 0;
+  function tryNext() {
+    if (idx >= candidates.length) {
+      // No image found — hide the img element
+      img.style.display = 'none';
+      return;
+    }
+    const candidate = candidates[idx++];
+    const tester = new Image();
+    tester.onload = function() {
+      img.src = candidate;
+    };
+    tester.onerror = function() {
+      tryNext();
+    };
+    tester.src = candidate;
+  }
+  tryNext();
+});
+</script>
 </body>
 
 </html>
