@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>All Projects - NyraTech Solutions Portfolio</title>
+  <meta name="description" content="Browse all sample projects and templates from NyraTech Solutions. Ecommerce, healthcare, education, and more.">
+  <meta name="keywords" content="portfolio, projects, templates, demos, web development, sample sites">
+  
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  
+  <style>
+    /* Custom styles to match the theme */
+    .projects-page .hero {
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('assets/img/hero-bg.jpg') center center;
+      background-size: cover;
+      padding: 120px 0 60px 0;
+      color: white;
+    }
+    
+    .projects-page .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    
+    .projects-page .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+    
+    .projects-page .section-title {
+      text-align: center;
+      padding-bottom: 30px;
+    }
+    
+    .projects-page .section-title h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+    
+    .projects-page .section-title p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+    
+    .project-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 30px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+      height: 100%;
+    }
+    
+    .project-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .project-image {
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .project-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .project-card:hover .project-image img {
+      transform: scale(1.05);
+    }
+    
+    .project-content {
+      padding: 25px;
+    }
+    
+    .project-category {
+      display: inline-block;
+      background: #f0f4ff;
+      color: #4154f1;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .project-content h3 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #012970;
+    }
+    
+    .project-content p {
+      color: #666;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    
+    .project-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    
+    .project-actions .btn {
+      flex: 1;
+      padding: 8px 15px;
+      font-size: 0.9rem;
+    }
+    
+    .filter-section {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 40px;
+    }
+    
+    .stats-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+    
+    .stats-card h3 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #4154f1;
+      margin-bottom: 5px;
+    }
+    
+    .stats-card p {
+      color: #666;
+      margin: 0;
+    }
+    
+    .back-to-home {
+      text-align: center;
+      margin-top: 50px;
+      margin-bottom: 30px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .projects-page .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .projects-page .hero p {
+        font-size: 1rem;
+      }
+      
+      .project-actions {
+        flex-direction: column;
+      }
+      
+      .project-image {
+        height: 180px;
+      }
+    }
+    
+    /* Animation for loading */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .project-card {
+      animation: fadeIn 0.5s ease-out;
+    }
+  </style>
+</head>
+
+<body class="projects-page">
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="index.html" class="logo d-flex align-items-center me-auto">
+        <img src="assets/img/logo.png" alt="NyraTech Solutions Logo">
+        <h1 class="sitename">NyraTech Solutions</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="index.html#portfolio">Portfolio</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+          <li><a href="all.html" class="active">All Projects</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted flex-md-shrink-0" href="index.html#contact">Get Started</a>
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Hero Section ======= -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8">
+          <h1 data-aos="fade-up">Our Complete Project Portfolio</h1>
+          <p data-aos="fade-up" data-aos-delay="100">Explore our extensive collection of sample projects, templates, and demos. Each project showcases our expertise in different technologies and industries.</p>
+          <div class="d-flex" data-aos="fade-up" data-aos-delay="200">
+            <a href="#projects" class="btn-get-started">Browse Projects</a>
+          </div>
+        </div>
+        <div class="col-lg-4 d-none d-lg-flex align-items-center justify-content-center">
+          <div class="stats-card" data-aos="fade-left" data-aos-delay="300">
+            <h3 id="projectCount">0</h3>
+            <p>Projects Available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section><!-- End Hero -->
+
+  <main id="main">
+    <!-- ======= Projects Section ======= -->
+    <section id="projects" class="section">
+      <div class="container" data-aos="fade-up">
+        <div class="section-title">
+          <h2>All Projects</h2>
+          <p>Filter and explore our complete collection of sample projects</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section" data-aos="fade-up" data-aos-delay="100">
+          <div class="row align-items-center">
+            <div class="col-md-6 mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" id="projectSearch" class="form-control" placeholder="Search projects by name or technology...">
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <select id="projectFilter" class="form-select">
+                <option value="all">All Categories</option>
+                <option value="ecommerce">E-commerce</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="education">Education</option>
+                <option value="business">Business</option>
+                <option value="portfolio">Portfolio</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="row" id="projectsContainer">
+          <!-- Projects will be loaded here dynamically -->
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+            <div class="project-card skeleton">
+              <div class="project-image" style="background: #f0f0f0; height: 220px;"></div>
+              <div class="project-content">
+                <div style="background: #f0f0f0; width: 80px; height: 24px; border-radius: 20px; margin-bottom: 15px;"></div>
+                <div style="background: #f0f0f0; height: 24px; width: 100%; margin-bottom: 10px;"></div>
+                <div style="background: #f0f0f0; height: 60px; width: 100%; margin-bottom: 20px;"></div>
+                <div style="display: flex; gap: 10px;">
+                  <div style="background: #f0f0f0; height: 40px; flex: 1; border-radius: 5px;"></div>
+                  <div style="background: #f0f0f0; height: 40px; flex: 1; border-radius: 5px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- More skeleton cards will be added by JS -->
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="text-center py-5" style="display: none;" data-aos="fade-up">
+          <i class="bi bi-search display-1 text-muted mb-3"></i>
+          <h3>No Projects Found</h3>
+          <p class="text-muted">Try adjusting your search or filter criteria.</p>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="back-to-home" data-aos="fade-up" data-aos-delay="100">
+          <a href="index.html" class="btn btn-primary btn-lg">
+            <i class="bi bi-arrow-left me-2"></i>Back to Homepage
+          </a>
+        </div>
+      </div>
+    </section><!-- End Projects Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="index.html" class="d-flex align-items-center">
+            <span class="sitename">NyraTech Solutions</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>Enterprise software, AI & cloud engineering</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+91 8928629182</span></p>
+            <p><strong>Email:</strong> <span>NehaSingh@nyratechsolutions.com</span></p>
+            <p><strong>Website:</strong> <span>www.nyratechsolutions.com</span></p>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html">Home</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html#services">Services</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="all.html">All Projects</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html#about">About</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html#contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+          <h4>Contact Information</h4>
+          <p>Contact us for enterprise-grade software, AI, and cloud solutions.</p>
+          <div class="contact-links d-flex flex-column">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-telephone me-2"></i> 
+              <span>+91 8928629182</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-envelope me-2"></i> 
+              <span>NehaSingh@nyratechsolutions.com</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="bi bi-globe me-2"></i> 
+              <span>www.nyratechsolutions.com</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <p class="mb-2"><strong>Technology Partner</strong></p>
+            <p class="small">Created by NyraTech Solutions<br>
+            Pune / PCMC, Maharashtra</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>2025</span> <strong class="px-1 sitename">NyraTech Solutions</strong> 
+      <span>All Rights Reserved. | Pioneering Human-AI Collaboration.</span></p>
+    </div>
+  </footer><!-- End Footer -->
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+  
+  <script>
+  // Projects data and filtering logic
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+      duration: 1000,
+      easing: 'ease-in-out',
+      once: true
+    });
+    
+    // Sample projects data (in production, this would come from an API)
+    const sampleFolders = [
+      "Nyrafoods", 
+      "Nyrafuture-imperfect", 
+      "Nyra_dynamic", 
+      "Nyra_eco_lume", 
+      "NYRA_shop", 
+      "NYRA_medic_care",
+      "Nyra_cafe",
+      "Nyra_dental",
+      "Nyra_education",
+      "Nyra_realestate"
+    ];
+    
+    // Function to format folder names to readable titles
+    function formatProjectName(folderName) {
+      return folderName
+        .replace(/[_-]+/g, ' ')
+        .replace(/\b\w/g, c => c.toUpperCase())
+        .replace(/Nyra/g, 'NyraTech ')
+        .replace(/NyraTech Tech/g, 'NyraTech')
+        .replace(/NyraTech /g, 'NyraTech ')
+        .trim();
+    }
+    
+    // Function to detect project category
+    function detectCategory(folderName) {
+      const name = folderName.toLowerCase();
+      if (name.includes('shop') || name.includes('commerce') || name.includes('store') || name.includes('food')) {
+        return 'ecommerce';
+      } else if (name.includes('medic') || name.includes('health') || name.includes('hospital') || name.includes('dental')) {
+        return 'healthcare';
+      } else if (name.includes('edu') || name.includes('school') || name.includes('learn') || name.includes('education')) {
+        return 'education';
+      } else if (name.includes('folio') || name.includes('portfolio') || name.includes('gallery')) {
+        return 'portfolio';
+      } else if (name.includes('business') || name.includes('corp') || name.includes('enterprise') || name.includes('realestate')) {
+        return 'business';
+      }
+      return 'other';
+    }
+    
+    // Function to generate description based on folder name
+    function generateDescription(folderName, category) {
+      const baseDescriptions = {
+        'ecommerce': 'Modern e-commerce platform with responsive design, product catalog, shopping cart, and secure checkout system.',
+        'healthcare': 'Healthcare management system featuring appointment scheduling, patient records, doctor profiles, and medical services.',
+        'education': 'Educational platform with course management, student dashboard, interactive learning features, and admin panel.',
+        'portfolio': 'Professional portfolio template showcasing projects, skills, and experience with modern design and animations.',
+        'business': 'Corporate website template with services, team profiles, contact information, and business solutions.',
+        'other': 'Professional website template built with modern web technologies, responsive design, and optimized performance.'
+      };
+      
+      const name = formatProjectName(folderName);
+      return baseDescriptions[category] || baseDescriptions.other;
+    }
+    
+    // Load projects from sample-sites folder
+    function loadProjects() {
+      try {
+        const projectsContainer = document.getElementById('projectsContainer');
+        const projectCount = document.getElementById('projectCount');
+        const noResults = document.getElementById('noResults');
+        
+        // Clear skeleton loaders
+        projectsContainer.innerHTML = '';
+        
+        sampleFolders.forEach((folder, index) => {
+          const category = detectCategory(folder);
+          const projectName = formatProjectName(folder);
+          const description = generateDescription(folder, category);
+          
+          // Calculate delay for animation
+          const delay = 200 + (index % 6) * 100;
+          
+          const projectCard = document.createElement('div');
+          projectCard.className = 'col-lg-4 col-md-6';
+          projectCard.setAttribute('data-aos', 'fade-up');
+          projectCard.setAttribute('data-aos-delay', delay);
+          projectCard.dataset.category = category;
+          projectCard.dataset.name = projectName.toLowerCase();
+          
+          projectCard.innerHTML = `
+            <div class="project-card">
+              <div class="project-image">
+                <img src="sample-sites/${folder}/screenshot.jpg" 
+                     alt="${projectName}" 
+                     class="img-fluid"
+                     loading="lazy"
+                     onerror="this.src='assets/img/project-placeholder.jpg'">
+              </div>
+              <div class="project-content">
+                <div class="project-category">${category.toUpperCase()}</div>
+                <h3>${projectName}</h3>
+                <p>${description}</p>
+                <div class="project-actions">
+                  <a href="sample-sites/${folder}/index.html" 
+                     class="btn btn-primary"
+                     target="_blank">
+                    <i class="bi bi-eye me-1"></i> Live Demo
+                  </a>
+                  <a href="sample-sites/${folder}/" 
+                     class="btn btn-outline-primary"
+                     target="_blank">
+                    <i class="bi bi-folder me-1"></i> View Files
+                  </a>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          projectsContainer.appendChild(projectCard);
+        });
+        
+        projectCount.textContent = sampleFolders.length;
+        
+        // Initialize filtering after projects are loaded
+        initFiltering();
+        
+        // Re-initialize AOS for new elements
+        AOS.refresh();
+        
+      } catch (error) {
+        console.error('Error loading projects:', error);
+        document.getElementById('projectsContainer').innerHTML = `
+          <div class="col-12 text-center py-5">
+            <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
+            <h3 class="mt-3">Unable to load projects</h3>
+            <p>Please check your connection and try again.</p>
+          </div>
+        `;
+      }
+    }
+    
+    // Initialize filtering functionality
+    function initFiltering() {
+      const searchInput = document.getElementById('projectSearch');
+      const filterSelect = document.getElementById('projectFilter');
+      const projectCards = document.querySelectorAll('.project-card');
+      const projectItems = document.querySelectorAll('#projectsContainer > div');
+      const noResults = document.getElementById('noResults');
+      
+      function filterProjects() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+        let visibleCount = 0;
+        
+        projectItems.forEach(item => {
+          const projectCard = item.querySelector('.project-card');
+          const projectName = item.dataset.name || '';
+          const projectCategory = item.dataset.category || '';
+          
+          const matchesSearch = searchTerm === '' || 
+            projectName.includes(searchTerm) ||
+            projectCard.textContent.toLowerCase().includes(searchTerm);
+          
+          const matchesFilter = filterValue === 'all' || projectCategory === filterValue;
+          const isVisible = matchesSearch && matchesFilter;
+          
+          item.style.display = isVisible ? 'block' : 'none';
+          if (isVisible) visibleCount++;
+        });
+        
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+      
+      searchInput.addEventListener('input', filterProjects);
+      filterSelect.addEventListener('change', filterProjects);
+      
+      // Trigger filter on page load to ensure proper display
+      setTimeout(filterProjects, 500);
+    }
+    
+    // Load projects when page loads
+    loadProjects();
+    
+    // Initialize GLightbox for project previews
+    const lightbox = GLightbox({
+      selector: '.glightbox'
+    });
+  });
+  </script>
+
+</body>
+</html>
