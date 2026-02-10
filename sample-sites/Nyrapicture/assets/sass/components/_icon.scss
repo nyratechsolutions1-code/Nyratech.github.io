@@ -1,0 +1,33 @@
+///
+/// Big Picture by NYRA TECH Solutions 
+/// 
+/// NYRA TECH Solutions 
+///
+
+/* Icon */
+
+	.icon {
+		@include icon;
+		position: relative;
+		text-decoration: none;
+
+		&:before {
+			line-height: inherit;
+		}
+
+		> .label {
+			display: none;
+		}
+
+		&.solid {
+			&:before {
+				font-weight: 900;
+			}
+		}
+
+		&.brands {
+			&:before {
+				font-family: 'Font Awesome 5 Brands';
+			}
+		}
+	}

@@ -1,0 +1,15 @@
+/*
+	Landed by NYRA TECH Solutions 
+	
+	NYRA TECH Solutions 
+*/
+
+/* Loader */
+
+	body.landing.is-preload:before {
+		display: none;
+	}
+
+	body.landing.is-preload:after {
+		display: none;
+	}

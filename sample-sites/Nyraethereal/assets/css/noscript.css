@@ -1,0 +1,21 @@
+/*
+	Ethereal by NYRA TECH Solutions 
+	
+	NYRA TECH Solutions 
+*/
+
+/* Page */
+
+	body {
+		overflow-x: scroll;
+	}
+
+/* Wrapper */
+
+	body.is-preload #wrapper {
+		-moz-transform: none;
+		-webkit-transform: none;
+		-ms-transform: none;
+		transform: none;
+		opacity: 1;
+	}

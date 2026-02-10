@@ -1,0 +1,11 @@
+/*
+	Big Picture by NYRA TECH Solutions 
+	
+	NYRA TECH Solutions 
+*/
+
+/* Loader */
+
+	body:before, body:after {
+		display: none;
+	}

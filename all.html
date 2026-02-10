@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>All Projects - NyraTech Solutions Portfolio</title>
+  <meta name="description" content="Browse all sample projects and templates from NyraTech Solutions. Ecommerce, healthcare, education, and more.">
+  <meta name="keywords" content="portfolio, projects, templates, demos, web development, sample sites">
+  
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  
+  <style>
+    /* All Projects Page Styles */
+    .all-projects-page .hero {
+      background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('assets/img/hero-bg.jpg') center center;
+      background-size: cover;
+      padding: 140px 0 80px 0;
+      color: white;
+    }
+    
+    .all-projects-page .hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    
+    .all-projects-page .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+      opacity: 0.9;
+    }
+    
+    .project-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+    
+    @media (max-width: 768px) {
+      .project-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .preview-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    
+    .preview-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    .preview-header {
+      background: #4154f1;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .preview-header h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .preview-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .preview-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .preview-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .preview-frame-wrapper {
+      position: relative;
+      height: 250px;
+      overflow: hidden;
+    }
+    
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+      transform-origin: 0 0;
+    }
+    
+    .preview-info {
+      padding: 20px;
+      background: #f8f9fa;
+    }
+    
+    .preview-info h5 {
+      color: #012970;
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+    
+    .preview-info p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+      min-height: 60px;
+    }
+    
+    .preview-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    
+    .badge {
+      background: #e9ecef;
+      color: #495057;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .badge-primary {
+      background: #4154f1;
+      color: white;
+    }
+    
+    .view-project-btn {
+      width: 100%;
+      background: #4154f1;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .view-project-btn:hover {
+      background: #2c42e0;
+      transform: translateY(-2px);
+    }
+    
+    .filter-section {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 40px;
+    }
+    
+    .stats-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+    
+    .stats-card h3 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #4154f1;
+      margin-bottom: 5px;
+    }
+    
+    .stats-card p {
+      color: #666;
+      margin: 0;
+    }
+    
+    .back-to-home {
+      text-align: center;
+      margin-top: 50px;
+      margin-bottom: 30px;
+    }
+    
+    /* Preview Controls */
+    .preview-controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      padding: 5px 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 10;
+    }
+    
+    .control-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Loading Animation */
+    .preview-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: #f8f9fa;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4154f1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      grid-column: 1 / -1;
+    }
+    
+    .no-results i {
+      font-size: 4rem;
+      color: #dee2e6;
+      margin-bottom: 20px;
+    }
+    
+    .no-results h3 {
+      color: #495057;
+      margin-bottom: 10px;
+    }
+    
+    .no-results p {
+      color: #6c757d;
+    }
+    
+    /* Responsive improvements */
+    @media (max-width: 992px) {
+      .project-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .preview-frame-wrapper {
+        height: 200px;
+      }
+      
+      .preview-info h5 {
+        font-size: 16px;
+      }
+      
+      .preview-info p {
+        font-size: 13px;
+        min-height: 50px;
+      }
+    }
+  </style>
+</head>
+
+<body class="all-projects-page">
+
+  <!-- ======= Header ======= -->
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container-fluid container-xl position-relative d-flex align-items-center">
+      <a href="index.html" class="logo d-flex align-items-center me-auto">
+        <img src="assets/img/logo.png" alt="NyraTech Solutions Logo">
+        <h1 class="sitename">NyraTech Solutions</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="index.html#projects-preview">Projects</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+          <li><a href="all.html" class="active">All Projects</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted flex-md-shrink-0" href="index.html#contact">Get Started</a>
+    </div>
+  </header><!-- End Header -->
+
+  <!-- ======= Hero Section ======= -->
+  <section class="hero" id="hero">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <h1 data-aos="fade-up">Our Complete Project Portfolio</h1>
+          <p data-aos="fade-up" data-aos-delay="100">Explore our extensive collection of sample projects, templates, and demos. Each project showcases our expertise in different technologies and industries.</p>
+          <div class="d-flex flex-wrap gap-3" data-aos="fade-up" data-aos-delay="200">
+            <a href="#projects" class="btn-get-started">Browse Projects</a>
+            <a href="index.html#contact" class="btn btn-outline-light">Start Your Project</a>
+          </div>
+        </div>
+        <div class="col-lg-4 d-none d-lg-flex justify-content-end">
+          <div class="stats-card" data-aos="fade-left" data-aos-delay="300">
+            <h3 id="projectCount">0</h3>
+            <p>Projects Available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section><!-- End Hero -->
+
+  <main id="main">
+    <!-- ======= Projects Section ======= -->
+    <section id="projects" class="section">
+      <div class="container" data-aos="fade-up">
+        <div class="section-title">
+          <h2>All Projects</h2>
+          <p>Filter and explore our complete collection of sample projects</p>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-section" data-aos="fade-up" data-aos-delay="100">
+          <div class="row align-items-center">
+            <div class="col-md-8 mb-3">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" id="projectSearch" class="form-control" placeholder="Search projects by name, technology, or category...">
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <select id="projectFilter" class="form-select">
+                <option value="all">All Categories</option>
+                <option value="ecommerce">E-commerce</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="food">Food & Restaurant</option>
+                <option value="business">Business</option>
+                <option value="blog">Blog</option>
+                <option value="portfolio">Portfolio</option>
+                <option value="education">Education</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="project-grid" id="projectsContainer">
+          <!-- Projects will be loaded here dynamically -->
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results" style="display: none;">
+          <i class="bi bi-search"></i>
+          <h3>No Projects Found</h3>
+          <p>Try adjusting your search or filter criteria.</p>
+        </div>
+
+        <!-- Back to Home -->
+        <div class="back-to-home" data-aos="fade-up" data-aos-delay="100">
+          <a href="index.html" class="btn btn-primary btn-lg">
+            <i class="bi bi-arrow-left me-2"></i>Back to Homepage
+          </a>
+        </div>
+      </div>
+    </section><!-- End Projects Section -->
+
+  </main><!-- End #main -->
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer" class="footer">
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-6 footer-about">
+          <a href="index.html" class="d-flex align-items-center">
+            <span class="sitename">NyraTech Solutions</span>
+          </a>
+          <div class="footer-contact pt-3">
+            <p>Enterprise software, AI & cloud engineering</p>
+            <p class="mt-3"><strong>Phone:</strong> <span>+91 8928629182</span></p>
+            <p><strong>Email:</strong> <span>NehaSingh@nyratechsolutions.com</span></p>
+            <p><strong>Website:</strong> <span>www.nyratechsolutions.com</span></p>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 footer-links">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html">Home</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html#services">Services</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="all.html">All Projects</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html#about">About</a></li>
+            <li><i class="bi bi-chevron-right"></i> <a href="index.html#contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-12">
+          <h4>Contact Information</h4>
+          <p>Contact us for enterprise-grade software, AI, and cloud solutions.</p>
+          <div class="contact-links d-flex flex-column">
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-telephone me-2"></i> 
+              <span>+91 8928629182</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-envelope me-2"></i> 
+              <span>NehaSingh@nyratechsolutions.com</span>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="bi bi-globe me-2"></i> 
+              <span>www.nyratechsolutions.com</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <p class="mb-2"><strong>Technology Partner</strong></p>
+            <p class="small">Created by NyraTech Solutions<br>
+            Pune / PCMC, Maharashtra</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>2025</span> <strong class="px-1 sitename">NyraTech Solutions</strong> 
+      <span>All Rights Reserved. | Pioneering Human-AI Collaboration.</span></p>
+    </div>
+  </footer><!-- End Footer -->
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+    <i class="bi bi-arrow-up-short"></i>
+  </a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+  
+  <script>
+  // All Projects Functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS
+    AOS.init({
+      duration: 1000,
+      easing: 'ease-in-out',
+      once: true
+    });
+    
+    // Your complete sampleFolders array
+    const sampleFolders = [
+      //"Nyraaerial",
+      //"Nyraalpha",
+      //"Nyradimension",
+      //"Nyradirective",
+      //"Nyraeditorial",
+      //"Nyraescape-velocity",
+      //"Nyraethereal",
+      "Nyrafoods",
+      //"Nyraforty",
+      //"Nyrafractal",
+      "Nyrafuture-imperfect",
+      //"Nyrahyperspace",
+      //"Nyralanded",
+      /*"Nyralens",
+      "Nyramassively",
+      "Nyramultiverse",
+      "Nyraparadigm-shift",
+      "Nyraparallelism",
+      "Nyraphantom",
+      "Nyraphoton",
+      "Nyrapicture",
+      "Nyrasolid-state",
+      "Nyraspectral",
+      "Nyrastellar",
+      "Nyrastrongly-typed",
+      "Nyratwenty",
+      "Nyra_buzz",*/
+      //"Nyra_cafe",
+      "Nyra_dynamic",
+      "Nyra_eco_lume",
+      /*"Nyra_edu_meeting",
+      "Nyra_event_invitation",
+      "Nyra_graphite_creative",
+      "Nyra_living_parallax",
+      "Nyra_seo_dream",
+      "Nyra_titan_folio",
+      "Nyra_winter_gallery",*/
+      //"Nyrafusion",
+      "NYRA_shop",
+      "NYRA_medic_care"
+    ];
+    
+    // Function to format folder names to readable titles
+    function formatProjectName(folderName) {
+      return folderName
+        .replace(/_/g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\bnyra\b/gi, 'NyraTech')
+        .replace(/\bnyratech tech\b/gi, 'NyraTech')
+        .replace(/\b\w/g, c => c.toUpperCase())
+        .trim();
+    }
+    
+    // Function to detect project category
+    function detectCategory(folderName) {
+      const name = folderName.toLowerCase();
+      if (name.includes('shop') || name.includes('commerce') || name.includes('store')) {
+        return 'ecommerce';
+      } else if (name.includes('medic') || name.includes('health') || name.includes('hospital')) {
+        return 'healthcare';
+      } else if (name.includes('food')) {
+        return 'food';
+      } else if (name.includes('blog') || name.includes('future')) {
+        return 'blog';
+      } else if (name.includes('dynamic')) {
+        return 'business';
+      } else if (name.includes('eco')) {
+        return 'portfolio';
+      }
+      return 'other';
+    }
+    
+    // Function to generate description based on folder name
+    function generateDescription(folderName, category) {
+      const baseDescriptions = {
+        'ecommerce': 'Modern e-commerce platform with product catalog, shopping cart, and secure checkout system.',
+        'healthcare': 'Healthcare management system with appointment booking, patient records, and doctor profiles.',
+        'food': 'Restaurant or food-related website with menu display and online ordering capabilities.',
+        'blog': 'Modern blog or content website with clean design and responsive layout.',
+        'business': 'Business website with modern design, interactive elements, and professional presentation.',
+        'portfolio': 'Creative portfolio or showcase website with modern aesthetics and design.',
+        'education': 'Educational platform with course listings and learning resources.',
+        'other': 'Professional website template built with modern web technologies and responsive design.'
+      };
+      
+      const name = formatProjectName(folderName);
+      return baseDescriptions[category] || baseDescriptions.other;
+    }
+    
+    // Function to detect technologies used
+    function detectTechnologies(folderName) {
+      // This is a simplified detection - in reality you'd check the project files
+      const techMap = {
+        'shop': ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
+        'medic': ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
+        'foods': ['HTML5', 'CSS3', 'JavaScript'],
+        'dynamic': ['HTML5', 'CSS3', 'JavaScript'],
+        'eco': ['HTML5', 'CSS3', 'JavaScript']
+      };
+      
+      for (const [key, techs] of Object.entries(techMap)) {
+        if (folderName.toLowerCase().includes(key)) {
+          return techs;
+        }
+      }
+      
+      return ['HTML5', 'CSS3', 'JavaScript'];
+    }
+    
+    // Load all projects
+    function loadAllProjects() {
+      const container = document.getElementById('projectsContainer');
+      const projectCount = document.getElementById('projectCount');
+      const noResults = document.getElementById('noResults');
+      
+      if (!container) return;
+      
+      container.innerHTML = '';
+      
+      // Create project objects from folder names
+      const allProjects = sampleFolders.map((folder, index) => {
+        const category = detectCategory(folder);
+        const projectName = formatProjectName(folder);
+        
+        return {
+          id: `project-${index}`,
+          folder: folder,
+          title: projectName,
+          description: generateDescription(folder, category),
+          category: category,
+          url: `sample-sites/${folder}/index.html`,
+          technologies: detectTechnologies(folder),
+          scale: 0.4
+        };
+      });
+      
+      // Display all projects
+      allProjects.forEach((project, index) => {
+        const projectHTML = `
+          <div class="preview-container" data-category="${project.category}" data-name="${project.title.toLowerCase()}">
+            <div class="preview-header">
+              <h4>${project.title}</h4>
+              <div class="preview-actions">
+                <button class="preview-btn" onclick="reloadPreview('${project.id}')" title="Reload">
+                  <i class="bi bi-arrow-clockwise"></i>
+                </button>
+                <button class="preview-btn" onclick="openFullscreen('${project.id}')" title="Expand">
+                  <i class="bi bi-arrows-fullscreen"></i>
+                </button>
+              </div>
+            </div>
+            <div class="preview-frame-wrapper">
+              <iframe 
+                id="preview-${project.id}"
+                class="preview-frame"
+                src="${project.url}"
+                loading="lazy"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                style="transform: scale(${project.scale}); width: ${100/project.scale}%; height: ${100/project.scale}%;"
+                onload="this.style.opacity = '1'"
+                onerror="this.onerror=null; this.src='assets/img/project-placeholder.html';"
+              ></iframe>
+              <div class="preview-controls">
+                <button class="control-btn" onclick="zoomIn('${project.id}')">+</button>
+                <button class="control-btn" onclick="zoomOut('${project.id}')">-</button>
+                <button class="control-btn" onclick="resetZoom('${project.id}')">100%</button>
+              </div>
+            </div>
+            <div class="preview-info">
+              <h5>${project.title}</h5>
+              <p>${project.description}</p>
+              <div class="preview-badges">
+                ${project.technologies.map(tech => `<span class="badge">${tech}</span>`).join('')}
+                <span class="badge badge-primary">${project.category}</span>
+              </div>
+              <button class="view-project-btn" onclick="window.open('${project.url}', '_blank')">
+                <i class="bi bi-box-arrow-up-right me-2"></i>Open Project
+              </button>
+            </div>
+          </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', projectHTML);
+      });
+      
+      projectCount.textContent = allProjects.length;
+      
+      // Initialize filtering
+      initFiltering(allProjects);
+      
+      // Re-initialize AOS for new elements
+      AOS.refresh();
+    }
+    
+    // Preview control functions
+    window.reloadPreview = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        const originalSrc = iframe.src;
+        iframe.src = '';
+        setTimeout(() => {
+          iframe.src = originalSrc;
+        }, 100);
+      }
+    };
+    
+    window.zoomIn = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        const currentScale = parseFloat(iframe.style.transform.replace('scale(', '').replace(')', '')) || 0.4;
+        const newScale = Math.min(currentScale + 0.1, 1);
+        iframe.style.transform = `scale(${newScale})`;
+        iframe.style.width = `${100/newScale}%`;
+        iframe.style.height = `${100/newScale}%`;
+      }
+    };
+    
+    window.zoomOut = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        const currentScale = parseFloat(iframe.style.transform.replace('scale(', '').replace(')', '')) || 0.4;
+        const newScale = Math.max(currentScale - 0.1, 0.2);
+        iframe.style.transform = `scale(${newScale})`;
+        iframe.style.width = `${100/newScale}%`;
+        iframe.style.height = `${100/newScale}%`;
+      }
+    };
+    
+    window.resetZoom = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        iframe.style.transform = 'scale(0.4)';
+        iframe.style.width = '250%';
+        iframe.style.height = '250%';
+      }
+    };
+    
+    window.openFullscreen = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        window.open(iframe.src, '_blank');
+      }
+    };
+    
+    // Initialize filtering functionality
+    function initFiltering(allProjects) {
+      const searchInput = document.getElementById('projectSearch');
+      const filterSelect = document.getElementById('projectFilter');
+      const projectContainers = document.querySelectorAll('.preview-container');
+      const noResults = document.getElementById('noResults');
+      
+      function filterProjects() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+        let visibleCount = 0;
+        
+        projectContainers.forEach(container => {
+          const projectName = container.dataset.name || '';
+          const projectCategory = container.dataset.category || '';
+          const projectText = container.textContent.toLowerCase();
+          
+          const matchesSearch = searchTerm === '' || 
+            projectName.includes(searchTerm) ||
+            projectText.includes(searchTerm);
+          
+          const matchesFilter = filterValue === 'all' || projectCategory === filterValue;
+          const isVisible = matchesSearch && matchesFilter;
+          
+          container.style.display = isVisible ? 'block' : 'none';
+          if (isVisible) visibleCount++;
+        });
+        
+        noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+      }
+      
+      searchInput.addEventListener('input', filterProjects);
+      filterSelect.addEventListener('change', filterProjects);
+      
+      // Trigger filter on page load
+      setTimeout(filterProjects, 500);
+    }
+    
+    // Load all projects when page loads
+    loadAllProjects();
+  });
+  </script>
+
+</body>
+</html>

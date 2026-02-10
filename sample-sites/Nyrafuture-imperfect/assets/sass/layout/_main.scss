@@ -1,0 +1,13 @@
+///
+/// Future Imperfect by NYRA TECH Solutions 
+/// 
+/// NYRA TECH Solutions 
+///
+
+/* Main */
+
+	#main {
+		@include vendor('flex-grow', '1');
+		-ms-flex: 1;
+		width: 100%;
+	}
