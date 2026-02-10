@@ -24,7 +24,7 @@
   <style>
     /* All Projects Page Styles */
     .all-projects-page .hero {
-      background: linear-gradient(rgba(0, 42, 112, 0.9), rgba(0, 42, 112, 0.9)), url('assets/img/hero-bg.jpg') center center;
+      background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('assets/img/hero-bg.jpg') center center;
       background-size: cover;
       padding: 140px 0 80px 0;
       color: white;
@@ -82,6 +82,9 @@
       margin: 0;
       font-size: 16px;
       font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .preview-actions {
@@ -130,6 +133,7 @@
       color: #012970;
       font-weight: 600;
       margin-bottom: 8px;
+      font-size: 18px;
     }
     
     .preview-info p {
@@ -137,6 +141,7 @@
       font-size: 14px;
       margin-bottom: 15px;
       line-height: 1.5;
+      min-height: 60px;
     }
     
     .preview-badges {
@@ -169,6 +174,9 @@
       border-radius: 6px;
       font-weight: 500;
       transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .view-project-btn:hover {
@@ -282,6 +290,29 @@
     .no-results p {
       color: #6c757d;
     }
+    
+    /* Responsive improvements */
+    @media (max-width: 992px) {
+      .project-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .preview-frame-wrapper {
+        height: 200px;
+      }
+      
+      .preview-info h5 {
+        font-size: 16px;
+      }
+      
+      .preview-info p {
+        font-size: 13px;
+        min-height: 50px;
+      }
+    }
   </style>
 </head>
 
@@ -359,6 +390,8 @@
                 <option value="food">Food & Restaurant</option>
                 <option value="business">Business</option>
                 <option value="blog">Blog</option>
+                <option value="portfolio">Portfolio</option>
+                <option value="education">Education</option>
                 <option value="other">Other</option>
               </select>
             </div>
@@ -470,99 +503,116 @@
       once: true
     });
     
-    // All projects data
-    const allProjects = [
-      {
-        id: 'nyrashop',
-        folder: 'NYRA_shop',
-        title: 'NyraShop - Ecommerce Platform',
-        description: 'Modern e-commerce platform with product catalog, shopping cart, and secure checkout system.',
-        category: 'ecommerce',
-        url: 'sample-sites/NYRA_shop/index.html',
-        technologies: ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
-        scale: 0.4
-      },
-      {
-        id: 'nyramedic',
-        folder: 'NYRA_medic_care',
-        title: 'NyraMedic - Healthcare Portal',
-        description: 'Healthcare management system with appointment booking, patient records, and doctor profiles.',
-        category: 'healthcare',
-        url: 'sample-sites/NYRA_medic_care/index.html',
-        technologies: ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
-        scale: 0.4
-      },
-      {
-        id: 'nyrafoods',
-        folder: 'Nyrafoods',
-        title: 'NyraFoods - Restaurant Website',
-        description: 'Restaurant website with menu display, online ordering, and table reservation system.',
-        category: 'food',
-        url: 'sample-sites/Nyrafoods/index.html',
-        technologies: ['HTML5', 'CSS3', 'JavaScript'],
-        scale: 0.4
-      },
-      {
-        id: 'nyradynamic',
-        folder: 'Nyra_dynamic',
-        title: 'NyraDynamic - Business Website',
-        description: 'Dynamic business website with modern design, interactive elements, and responsive layout.',
-        category: 'business',
-        url: 'sample-sites/Nyra_dynamic/index.html',
-        technologies: ['HTML5', 'CSS3', 'JavaScript'],
-        scale: 0.4
-      },
-      {
-        id: 'nyrafuture',
-        folder: 'Nyrafuture-imperfect',
-        title: 'NyraFuture - Blog Template',
-        description: 'Modern blog template with clean design, responsive layout, and content management.',
-        category: 'blog',
-        url: 'sample-sites/Nyrafuture-imperfect/index.html',
-        technologies: ['HTML5', 'CSS3'],
-        scale: 0.4
-      },
-      {
-        id: 'nyraecolume',
-        folder: 'Nyra_eco_lume',
-        title: 'EcoLume - Eco Products',
-        description: 'Eco-friendly products showcase with sustainable design principles and modern aesthetics.',
-        category: 'ecommerce',
-        url: 'sample-sites/Nyra_eco_lume/index.html',
-        technologies: ['HTML5', 'CSS3', 'JavaScript'],
-        scale: 0.4
-      },
-      {
-        id: 'nyracafe',
-        folder: 'Nyra_cafe',
-        title: 'NyraCafe - Coffee Shop',
-        description: 'Coffee shop website with menu, location, and online ordering capabilities.',
-        category: 'food',
-        url: 'sample-sites/Nyra_cafe/index.html',
-        technologies: ['HTML5', 'CSS3'],
-        scale: 0.4
-      },
-      {
-        id: 'nyraeducation',
-        folder: 'Nyra_education',
-        title: 'NyraEducation - Learning Platform',
-        description: 'Educational platform with course listings, student dashboard, and learning resources.',
-        category: 'education',
-        url: 'sample-sites/Nyra_education/index.html',
-        technologies: ['HTML5', 'CSS3', 'JavaScript'],
-        scale: 0.4
-      },
-      {
-        id: 'nyrarealestate',
-        folder: 'Nyra_realestate',
-        title: 'NyraRealEstate - Property Portal',
-        description: 'Real estate portal with property listings, search filters, and agent profiles.',
-        category: 'business',
-        url: 'sample-sites/Nyra_realestate/index.html',
-        technologies: ['HTML5', 'CSS3', 'JavaScript'],
-        scale: 0.4
-      }
+    // Your complete sampleFolders array
+    const sampleFolders = [
+      //"Nyraaerial",
+      //"Nyraalpha",
+      //"Nyradimension",
+      //"Nyradirective",
+      //"Nyraeditorial",
+      //"Nyraescape-velocity",
+      //"Nyraethereal",
+      "Nyrafoods",
+      //"Nyraforty",
+      //"Nyrafractal",
+      "Nyrafuture-imperfect",
+      //"Nyrahyperspace",
+      //"Nyralanded",
+      /*"Nyralens",
+      "Nyramassively",
+      "Nyramultiverse",
+      "Nyraparadigm-shift",
+      "Nyraparallelism",
+      "Nyraphantom",
+      "Nyraphoton",
+      "Nyrapicture",
+      "Nyrasolid-state",
+      "Nyraspectral",
+      "Nyrastellar",
+      "Nyrastrongly-typed",
+      "Nyratwenty",
+      "Nyra_buzz",*/
+      //"Nyra_cafe",
+      "Nyra_dynamic",
+      "Nyra_eco_lume",
+      /*"Nyra_edu_meeting",
+      "Nyra_event_invitation",
+      "Nyra_graphite_creative",
+      "Nyra_living_parallax",
+      "Nyra_seo_dream",
+      "Nyra_titan_folio",
+      "Nyra_winter_gallery",*/
+      //"Nyrafusion",
+      "NYRA_shop",
+      "NYRA_medic_care"
     ];
+    
+    // Function to format folder names to readable titles
+    function formatProjectName(folderName) {
+      return folderName
+        .replace(/_/g, ' ')
+        .replace(/-/g, ' ')
+        .replace(/\bnyra\b/gi, 'NyraTech')
+        .replace(/\bnyratech tech\b/gi, 'NyraTech')
+        .replace(/\b\w/g, c => c.toUpperCase())
+        .trim();
+    }
+    
+    // Function to detect project category
+    function detectCategory(folderName) {
+      const name = folderName.toLowerCase();
+      if (name.includes('shop') || name.includes('commerce') || name.includes('store')) {
+        return 'ecommerce';
+      } else if (name.includes('medic') || name.includes('health') || name.includes('hospital')) {
+        return 'healthcare';
+      } else if (name.includes('food')) {
+        return 'food';
+      } else if (name.includes('blog') || name.includes('future')) {
+        return 'blog';
+      } else if (name.includes('dynamic')) {
+        return 'business';
+      } else if (name.includes('eco')) {
+        return 'portfolio';
+      }
+      return 'other';
+    }
+    
+    // Function to generate description based on folder name
+    function generateDescription(folderName, category) {
+      const baseDescriptions = {
+        'ecommerce': 'Modern e-commerce platform with product catalog, shopping cart, and secure checkout system.',
+        'healthcare': 'Healthcare management system with appointment booking, patient records, and doctor profiles.',
+        'food': 'Restaurant or food-related website with menu display and online ordering capabilities.',
+        'blog': 'Modern blog or content website with clean design and responsive layout.',
+        'business': 'Business website with modern design, interactive elements, and professional presentation.',
+        'portfolio': 'Creative portfolio or showcase website with modern aesthetics and design.',
+        'education': 'Educational platform with course listings and learning resources.',
+        'other': 'Professional website template built with modern web technologies and responsive design.'
+      };
+      
+      const name = formatProjectName(folderName);
+      return baseDescriptions[category] || baseDescriptions.other;
+    }
+    
+    // Function to detect technologies used
+    function detectTechnologies(folderName) {
+      // This is a simplified detection - in reality you'd check the project files
+      const techMap = {
+        'shop': ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
+        'medic': ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
+        'foods': ['HTML5', 'CSS3', 'JavaScript'],
+        'dynamic': ['HTML5', 'CSS3', 'JavaScript'],
+        'eco': ['HTML5', 'CSS3', 'JavaScript']
+      };
+      
+      for (const [key, techs] of Object.entries(techMap)) {
+        if (folderName.toLowerCase().includes(key)) {
+          return techs;
+        }
+      }
+      
+      return ['HTML5', 'CSS3', 'JavaScript'];
+    }
     
     // Load all projects
     function loadAllProjects() {
@@ -574,6 +624,24 @@
       
       container.innerHTML = '';
       
+      // Create project objects from folder names
+      const allProjects = sampleFolders.map((folder, index) => {
+        const category = detectCategory(folder);
+        const projectName = formatProjectName(folder);
+        
+        return {
+          id: `project-${index}`,
+          folder: folder,
+          title: projectName,
+          description: generateDescription(folder, category),
+          category: category,
+          url: `sample-sites/${folder}/index.html`,
+          technologies: detectTechnologies(folder),
+          scale: 0.4
+        };
+      });
+      
+      // Display all projects
       allProjects.forEach((project, index) => {
         const projectHTML = `
           <div class="preview-container" data-category="${project.category}" data-name="${project.title.toLowerCase()}">
@@ -597,6 +665,7 @@
                 sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
                 style="transform: scale(${project.scale}); width: ${100/project.scale}%; height: ${100/project.scale}%;"
                 onload="this.style.opacity = '1'"
+                onerror="this.onerror=null; this.src='assets/img/project-placeholder.html';"
               ></iframe>
               <div class="preview-controls">
                 <button class="control-btn" onclick="zoomIn('${project.id}')">+</button>
@@ -624,7 +693,7 @@
       projectCount.textContent = allProjects.length;
       
       // Initialize filtering
-      initFiltering();
+      initFiltering(allProjects);
       
       // Re-initialize AOS for new elements
       AOS.refresh();
@@ -634,7 +703,11 @@
     window.reloadPreview = function(projectId) {
       const iframe = document.getElementById(`preview-${projectId}`);
       if (iframe) {
-        iframe.src = iframe.src;
+        const originalSrc = iframe.src;
+        iframe.src = '';
+        setTimeout(() => {
+          iframe.src = originalSrc;
+        }, 100);
       }
     };
     
@@ -670,14 +743,14 @@
     };
     
     window.openFullscreen = function(projectId) {
-      const project = allProjects.find(p => p.id === projectId);
-      if (project) {
-        window.open(project.url, '_blank');
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        window.open(iframe.src, '_blank');
       }
     };
     
     // Initialize filtering functionality
-    function initFiltering() {
+    function initFiltering(allProjects) {
       const searchInput = document.getElementById('projectSearch');
       const filterSelect = document.getElementById('projectFilter');
       const projectContainers = document.querySelectorAll('.preview-container');
