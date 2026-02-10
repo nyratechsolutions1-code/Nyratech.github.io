@@ -22,27 +22,202 @@
 
   <!-- Main CSS Files -->
   <link href="assets/css/main.css" rel="stylesheet">
-  <link href="assets/css/projects.css" rel="stylesheet">
 
-  <!-- Primary Schema Markup -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "NyraTech Solutions",
-    "url": "https://nyratechsolutions.com",
-    "logo": "https://nyratechsolutions.com/assets/img/logo.png",
-    "description": "Enterprise-grade software, AI, and cloud solutions provider",
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+918928629182",
-      "contactType": "Customer Service",
-      "email": "NehaSingh@nyratechsolutions.com",
-      "areaServed": "IN",
-      "availableLanguage": "English"
+  <style>
+    /* Project Preview Styles */
+    .project-preview-section {
+      padding: 80px 0;
     }
-  }
-  </script>
+    
+    .preview-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+    
+    .preview-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    .preview-header {
+      background: #4154f1;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .preview-header h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .preview-actions {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .preview-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    
+    .preview-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .preview-frame-wrapper {
+      position: relative;
+      height: 300px;
+      overflow: hidden;
+    }
+    
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: white;
+      transform-origin: 0 0;
+    }
+    
+    .preview-info {
+      padding: 20px;
+      background: #f8f9fa;
+    }
+    
+    .preview-info h5 {
+      color: #012970;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .preview-info p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    
+    .preview-badges {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    
+    .badge {
+      background: #e9ecef;
+      color: #495057;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .badge-primary {
+      background: #4154f1;
+      color: white;
+    }
+    
+    .view-project-btn {
+      width: 100%;
+      background: #4154f1;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .view-project-btn:hover {
+      background: #2c42e0;
+      transform: translateY(-2px);
+    }
+    
+    .all-projects-cta {
+      text-align: center;
+      margin-top: 50px;
+    }
+    
+    /* Preview Controls */
+    .preview-controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 20px;
+      padding: 5px 15px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 10;
+    }
+    
+    .control-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+    
+    .control-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      .preview-frame-wrapper {
+        height: 250px;
+      }
+      
+      .preview-container {
+        margin-bottom: 30px;
+      }
+    }
+    
+    /* Loading Animation */
+    .preview-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: #f8f9fa;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4154f1;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -59,7 +234,7 @@
         <ul>
           <li><a href="#hero" class="active">Home</a></li>
           <li><a href="#services">Services</a></li>
-          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#projects-preview">Projects</a></li>
           <li><a href="#about">About</a></li>
           <li><a href="#why-choose-us">Why Choose Us</a></li>
           <li><a href="#testimonials">Testimonials</a></li>
@@ -85,8 +260,8 @@
             <p data-aos="fade-up" data-aos-delay="100">Harness the power of AI-driven automation, intelligent systems, and human expertise to optimize efficiency, accelerate innovation, and drive sustainable growth.</p>
             <div class="d-flex flex-column flex-md-row" data-aos="fade-up" data-aos-delay="200">
               <a href="#services" class="btn-get-started">Our Services <i class="bi bi-arrow-right"></i></a>
-              <a href="#contact" class="glightbox btn-watch-video d-flex align-items-center justify-content-center ms-0 ms-md-4 mt-4 mt-md-0">
-                <i class="bi bi-play-circle"></i><span>Start Journey</span>
+              <a href="#projects-preview" class="glightbox btn-watch-video d-flex align-items-center justify-content-center ms-0 ms-md-4 mt-4 mt-md-0">
+                <i class="bi bi-laptop"></i><span>View Projects</span>
               </a>
             </div>
           </div>
@@ -163,53 +338,52 @@
       </div>
     </section><!-- /Services Section -->
 
-    <!-- Portfolio Preview Section -->
-    <section id="portfolio" class="section bg-light">
+    <!-- Projects Preview Section -->
+    <section id="projects-preview" class="section project-preview-section bg-light">
       <div class="container section-title" data-aos="fade-up">
-        <h2>Featured Projects</h2>
-        <p>A glimpse of our recent successful implementations</p>
+        <h2>Live Project Previews</h2>
+        <p>Interactive previews of our recent work. Click to explore each project.</p>
       </div>
 
-      <div class="container" data-aos="fade-up">
-        <div class="row gy-4" id="featuredProjects">
-          <!-- Featured projects will be loaded dynamically -->
-          <div class="col-lg-4">
-            <div class="project-card skeleton">
-              <div class="project-image placeholder"></div>
-              <div class="project-content">
-                <h3 class="placeholder-text"></h3>
-                <p class="placeholder-text"></p>
-                <div class="placeholder-button"></div>
+      <div class="container">
+        <div class="row gy-4" id="projectsContainer">
+          <!-- Projects will be loaded dynamically -->
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+            <div class="preview-container">
+              <div class="preview-header">
+                <h4>Loading Preview...</h4>
+                <div class="preview-actions">
+                  <button class="preview-btn" title="Reload"><i class="bi bi-arrow-clockwise"></i></button>
+                  <button class="preview-btn" title="Expand"><i class="bi bi-arrows-fullscreen"></i></button>
+                </div>
+              </div>
+              <div class="preview-frame-wrapper">
+                <div class="preview-loading">
+                  <div class="spinner"></div>
+                </div>
+              </div>
+              <div class="preview-info">
+                <h5>Loading Project...</h5>
+                <p>Project information is being loaded.</p>
+                <div class="preview-badges">
+                  <span class="badge">Loading</span>
+                </div>
+                <button class="view-project-btn" disabled>
+                  <i class="bi bi-hourglass-split me-2"></i>Loading...
+                </button>
               </div>
             </div>
           </div>
-          <div class="col-lg-4">
-            <div class="project-card skeleton">
-              <div class="project-image placeholder"></div>
-              <div class="project-content">
-                <h3 class="placeholder-text"></h3>
-                <p class="placeholder-text"></p>
-                <div class="placeholder-button"></div>
-              </div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="project-card skeleton">
-              <div class="project-image placeholder"></div>
-              <div class="project-content">
-                <h3 class="placeholder-text"></h3>
-                <p class="placeholder-text"></p>
-                <div class="placeholder-button"></div>
-              </div>
-            </div>
-          </div>
+          <!-- Additional loading cards will be added by JavaScript -->
         </div>
         
-        <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="100">
-          <a href="/all" class="btn btn-primary btn-lg px-5">View All Projects</a>
+        <div class="all-projects-cta" data-aos="fade-up" data-aos-delay="200">
+          <a href="all.html" class="btn btn-primary btn-lg">
+            <i class="bi bi-grid-3x3-gap me-2"></i>View All Projects
+          </a>
         </div>
       </div>
-    </section><!-- /Portfolio Section -->
+    </section><!-- /Projects Preview Section -->
 
     <!-- About Company Section -->
     <section id="about" class="about section">
@@ -495,7 +669,7 @@
           <ul>
             <li><a href="#hero">Home</a></li>
             <li><a href="#services">Services</a></li>
-            <li><a href="#portfolio">Portfolio</a></li>
+            <li><a href="#projects-preview">Projects</a></li>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
@@ -555,10 +729,193 @@
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
 
-  <!-- Main JS Files -->
+  <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
-  <script src="assets/js/projects.js"></script>
-  <script src="assets/js/lazy-load.js"></script>
+  
+  <script>
+  // Projects Preview Functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sample projects data
+    const projects = [
+      {
+        id: 'nyrashop',
+        folder: 'NYRA_shop',
+        title: 'NyraShop - Ecommerce Platform',
+        description: 'Modern e-commerce platform with product catalog, shopping cart, and secure checkout.',
+        category: 'ecommerce',
+        url: 'sample-sites/NYRA_shop/index.html',
+        technologies: ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
+        scale: 0.5
+      },
+      {
+        id: 'nyramedic',
+        folder: 'NYRA_medic_care',
+        title: 'NyraMedic - Healthcare Portal',
+        description: 'Healthcare management system with appointment booking and patient portal.',
+        category: 'healthcare',
+        url: 'sample-sites/NYRA_medic_care/index.html',
+        technologies: ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
+        scale: 0.5
+      },
+      {
+        id: 'nyrafoods',
+        folder: 'Nyrafoods',
+        title: 'NyraFoods - Restaurant Website',
+        description: 'Restaurant website with menu, online ordering, and table reservation system.',
+        category: 'food',
+        url: 'sample-sites/Nyrafoods/index.html',
+        technologies: ['HTML5', 'CSS3', 'JavaScript'],
+        scale: 0.5
+      },
+      {
+        id: 'nyradynamic',
+        folder: 'Nyra_dynamic',
+        title: 'NyraDynamic - Business Website',
+        description: 'Dynamic business website with modern design and interactive elements.',
+        category: 'business',
+        url: 'sample-sites/Nyra_dynamic/index.html',
+        technologies: ['HTML5', 'CSS3', 'JavaScript'],
+        scale: 0.5
+      },
+      {
+        id: 'nyrafuture',
+        folder: 'Nyrafuture-imperfect',
+        title: 'NyraFuture - Blog Template',
+        description: 'Modern blog template with clean design and responsive layout.',
+        category: 'blog',
+        url: 'sample-sites/Nyrafuture-imperfect/index.html',
+        technologies: ['HTML5', 'CSS3'],
+        scale: 0.5
+      },
+      {
+        id: 'nyraecolume',
+        folder: 'Nyra_eco_lume',
+        title: 'EcoLume - Eco Products',
+        description: 'Eco-friendly products showcase with sustainable design principles.',
+        category: 'ecommerce',
+        url: 'sample-sites/Nyra_eco_lume/index.html',
+        technologies: ['HTML5', 'CSS3', 'JavaScript'],
+        scale: 0.5
+      }
+    ];
+
+    // Load projects onto homepage
+    function loadProjects() {
+      const container = document.getElementById('projectsContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+      
+      // Take only first 3 projects for homepage
+      const featuredProjects = projects.slice(0, 3);
+      
+      featuredProjects.forEach((project, index) => {
+        const delay = 100 + (index * 100);
+        
+        const projectHTML = `
+          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="${delay}">
+            <div class="preview-container">
+              <div class="preview-header">
+                <h4>${project.title}</h4>
+                <div class="preview-actions">
+                  <button class="preview-btn" onclick="reloadPreview('${project.id}')" title="Reload">
+                    <i class="bi bi-arrow-clockwise"></i>
+                  </button>
+                  <button class="preview-btn" onclick="openFullscreen('${project.id}')" title="Expand">
+                    <i class="bi bi-arrows-fullscreen"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="preview-frame-wrapper">
+                <iframe 
+                  id="preview-${project.id}"
+                  class="preview-frame"
+                  src="${project.url}"
+                  loading="lazy"
+                  sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                  style="transform: scale(${project.scale}); width: ${100/project.scale}%; height: ${100/project.scale}%;"
+                  onload="this.style.opacity = '1'"
+                ></iframe>
+                <div class="preview-controls">
+                  <button class="control-btn" onclick="zoomIn('${project.id}')">+</button>
+                  <button class="control-btn" onclick="zoomOut('${project.id}')">-</button>
+                  <button class="control-btn" onclick="resetZoom('${project.id}')">100%</button>
+                </div>
+              </div>
+              <div class="preview-info">
+                <h5>${project.title}</h5>
+                <p>${project.description}</p>
+                <div class="preview-badges">
+                  ${project.technologies.map(tech => `<span class="badge">${tech}</span>`).join('')}
+                  <span class="badge badge-primary">${project.category}</span>
+                </div>
+                <button class="view-project-btn" onclick="window.open('${project.url}', '_blank')">
+                  <i class="bi bi-box-arrow-up-right me-2"></i>Open Project
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', projectHTML);
+      });
+      
+      // Initialize AOS for new elements
+      if (typeof AOS !== 'undefined') {
+        AOS.refresh();
+      }
+    }
+    
+    // Preview control functions
+    window.reloadPreview = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        iframe.src = iframe.src;
+      }
+    };
+    
+    window.zoomIn = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        const currentScale = parseFloat(iframe.style.transform.replace('scale(', '').replace(')', '')) || 0.5;
+        const newScale = Math.min(currentScale + 0.1, 1);
+        iframe.style.transform = `scale(${newScale})`;
+        iframe.style.width = `${100/newScale}%`;
+        iframe.style.height = `${100/newScale}%`;
+      }
+    };
+    
+    window.zoomOut = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        const currentScale = parseFloat(iframe.style.transform.replace('scale(', '').replace(')', '')) || 0.5;
+        const newScale = Math.max(currentScale - 0.1, 0.3);
+        iframe.style.transform = `scale(${newScale})`;
+        iframe.style.width = `${100/newScale}%`;
+        iframe.style.height = `${100/newScale}%`;
+      }
+    };
+    
+    window.resetZoom = function(projectId) {
+      const iframe = document.getElementById(`preview-${projectId}`);
+      if (iframe) {
+        iframe.style.transform = 'scale(0.5)';
+        iframe.style.width = '200%';
+        iframe.style.height = '200%';
+      }
+    };
+    
+    window.openFullscreen = function(projectId) {
+      const project = projects.find(p => p.id === projectId);
+      if (project) {
+        window.open(project.url, '_blank');
+      }
+    };
+    
+    // Load projects when page is ready
+    setTimeout(loadProjects, 500);
+  });
+  </script>
 
 </body>
 </html>
