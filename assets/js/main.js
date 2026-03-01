@@ -199,6 +199,16 @@
     }
   });
 
+  // dynamically load chatbot logic on every page if not already loaded
+  (function(){
+    if (!document.getElementById('chatbot-script')) {
+      const s = document.createElement('script');
+      s.id = 'chatbot-script';
+      s.src = 'assets/js/chatbot.js';
+      document.body.appendChild(s);
+    }
+  })();
+
   /**
    * Navmenu Scrollspy
    */

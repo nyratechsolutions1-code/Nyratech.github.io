@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Admin Panel - NyraTech Solutions</title>
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/main.css" rel="stylesheet">
+  <style>
+    /* additional admin styles */
+    #login-box, #dashboard-box { max-width: 500px; margin: 80px auto; }
+    .nav-tabs .badge { margin-left: 5px; }
+  </style>
+</head>
+<body class="admin-panel">
+
+  <div id="login-box">
+    <h2 class="text-center mb-4">Administrator Login</h2>
+    <form id="admin-login-form">
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+      <button class="btn btn-primary w-100" type="submit">Login</button>
+    </form>
+  </div>
+
+  <div id="dashboard-box" style="display:none;">
+    <h2 class="mb-4">Admin Dashboard</h2>
+    <button id="logout-btn" class="btn btn-outline-secondary mb-3">Logout</button>
+    <ul class="nav nav-tabs" id="adminTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button" role="tab">Contacts<span class="badge bg-danger" id="contacts-badge" style="display:none;"></span></button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="bot-tab" data-bs-toggle="tab" data-bs-target="#bot" type="button" role="tab">Bot Responses</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="suggestions-tab" data-bs-toggle="tab" data-bs-target="#suggestions" type="button" role="tab">Suggested Questions</button>
+      </li>
+    </ul>
+    <div class="tab-content p-3 border border-top-0" id="adminTabContent">
+      <!-- Contacts tab -->
+      <div class="tab-pane fade show active" id="contacts" role="tabpanel">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Time</th><th>Message</th><th>Action</th></tr></thead>
+            <tbody id="contacts-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Bot responses editor -->
+      <div class="tab-pane fade" id="bot" role="tabpanel">
+        <div id="bot-responses-container"></div>
+        <button id="add-bot-qna" class="btn btn-sm btn-primary">Add Q&A</button>
+      </div>
+      <!-- Suggestions editor -->
+      <div class="tab-pane fade" id="suggestions" role="tabpanel">
+        <div id="suggestions-container"></div>
+        <button id="add-suggestion" class="btn btn-sm btn-primary">Add Suggestion</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/chatbot.js"></script>
+</body>
+</html>
