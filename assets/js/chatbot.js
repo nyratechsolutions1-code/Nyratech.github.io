@@ -6,6 +6,7 @@
   const LAST_VIEWED_CONTACTS_KEY = 'lastViewedContacts';
   const CHAT_CONVERSATION_KEY = 'chatConversation';
   const ADMIN_SESSION_KEY = 'adminSession';
+  const SITE_HITS_KEY = 'siteHits';
   const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
 
   const defaultResponses = {
@@ -102,6 +103,26 @@
   function formatTime(date) {
     const d = new Date(date);
     return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  }
+
+  // site hit counter ------------------------------------------------------
+  function loadHits() {
+    const h = parseInt(localStorage.getItem(SITE_HITS_KEY), 10);
+    return isNaN(h) ? 0 : h;
+  }
+  function saveHits(n) {
+    try { localStorage.setItem(SITE_HITS_KEY, String(n)); } catch (e) {}
+  }
+  function incrementHits() {
+    const count = loadHits() + 1;
+    saveHits(count);
+    return count;
+  }
+  function updateHitsDisplay() {
+    const el = document.getElementById('hits-number');
+    if (el) {
+      el.textContent = loadHits();
+    }
   }
 
   // chat UI ---------------------------------------------------------------
@@ -433,6 +454,7 @@
     if (dash) dash.style.display = 'block';
     localStorage.setItem(LAST_VIEWED_CONTACTS_KEY, new Date().toISOString());
     updateBadgeCount();
+    updateHitsDisplay();
   }
 
   // contacts table
@@ -559,6 +581,9 @@
 
   // run init
   document.addEventListener('DOMContentLoaded', function() {
+    // increment hit counter each page load
+    incrementHits();
+
     createChatUI();
     initContactForm();
     updateBadgeCount();
