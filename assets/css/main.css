@@ -690,18 +690,9 @@ h6 {
 /*--------------------------------------------------------------
 # Scroll Top Button
 --------------------------------------------------------------*/
+/* hide scroll-top completely as requested */
 .scroll-top {
-  position: fixed;
-  visibility: hidden;
-  opacity: 0;
-  right: 75px; /* shifted left to clear chat button */
-  bottom: 15px; /* stays near bottom, chat button is above */
-  z-index: 99999;
-  background-color: var(--accent-color);
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  transition: all 0.4s;
+  display: none !important;
 }
 
 .scroll-top i {

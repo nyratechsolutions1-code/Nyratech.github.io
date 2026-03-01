@@ -50,7 +50,11 @@
   }
 
   function loadContacts() {
-    try { return JSON.parse(localStorage.getItem(CONTACTS_KEY)) || []; } catch (e) { return []; }
+    try {
+      const stored = JSON.parse(localStorage.getItem(CONTACTS_KEY));
+      if (Array.isArray(stored)) return stored;
+    } catch (e) {}
+    return [];
   }
 
   function saveContacts(arr) {
@@ -251,32 +255,126 @@
   function initContactForm() {
     const form = document.querySelector('form.php-email-form');
     if (!form) return;
+    let isSubmitting = false;
+
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      const name = form.querySelector('input[name="name"]').value.trim();
-      const email = form.querySelector('input[name="email"]').value.trim();
-      const phone = form.querySelector('input[name="phone"]').value.trim();
-      const message = form.querySelector('textarea[name="message"]').value.trim();
+
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      const errMsg = form.querySelector('.error-message');
+      if (errMsg) errMsg.style.display = 'none';
+      const sentMsg = form.querySelector('.sent-message');
+      if (sentMsg) sentMsg.style.display = 'none';
+
+      const nameInput = form.querySelector('input[name="name"]');
+      const emailInput = form.querySelector('input[name="email"]');
+      const phoneInput = form.querySelector('input[name="phone"]');
+      const companyInput = form.querySelector('input[name="company"]');
+      const serviceInput = form.querySelector('select[name="service"]');
+      const messageInput = form.querySelector('textarea[name="message"]');
+
+      const name = nameInput ? nameInput.value.trim() : '';
+      const email = emailInput ? emailInput.value.trim() : '';
+      const phone = phoneInput ? phoneInput.value.trim() : '';
+      const company = companyInput ? companyInput.value.trim() : '';
+      const service = serviceInput ? serviceInput.value : '';
+      const message = messageInput ? messageInput.value.trim() : '';
+
       if (!name || !email || !message) {
-        showFormError(form, 'Please fill in all required fields');
+        isSubmitting = false;
+        showValidationErrorModal('Please fill in all required fields (Name, Email, and Message)');
         return;
       }
-      const contacts = loadContacts();
-      contacts.push({name, email, phone, message, timestamp: new Date().toISOString()});
-      saveContacts(contacts);
-      updateBadgeCount();
-      showFormSuccess(form);
-      form.reset();
+      if (!service) {
+        isSubmitting = false;
+        showValidationErrorModal('Please select a service interest');
+        return;
+      }
+
+      try {
+        const contacts = loadContacts();
+        contacts.push({name, email, phone, company, service, message, timestamp: new Date().toISOString()});
+        saveContacts(contacts);
+        updateBadgeCount();
+        showThankYouModal();
+        form.reset();
+      } catch (error) {
+        console.error('Error saving contact:', error);
+        showValidationErrorModal('Error saving your message. Please try again.');
+      }
+
+      isSubmitting = false;
     });
   }
 
-  function showFormError(form, text) {
-    const err = form.querySelector('.error-message');
-    if (err) { err.textContent = text; err.style.display = 'block'; }
+  function showValidationErrorModal(message) {
+    const existingModal = document.getElementById('errorModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+    
+    const modal = document.createElement('div');
+    modal.id = 'errorModal';
+    modal.className = 'modal fade';
+    modal.setAttribute('tabindex', '-1');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white border-0">
+            <h5 class="modal-title">Error</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <i class="bi bi-exclamation-circle text-danger" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+            <p style="font-size: 1rem; margin-bottom: 0;">${message}</p>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    modal.addEventListener('hidden.bs.modal', () => modal.remove());
   }
-  function showFormSuccess(form) {
-    const success = form.querySelector('.sent-message');
-    if (success) { success.style.display = 'block'; setTimeout(()=>{ success.style.display='none'; }, 2000); }
+
+  function showThankYouModal() {
+    const existingModal = document.getElementById('thankYouModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+    
+    const modal = document.createElement('div');
+    modal.id = 'thankYouModal';
+    modal.className = 'modal fade';
+    modal.setAttribute('tabindex', '-1');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white border-0">
+            <h5 class="modal-title">Thank You!</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <i class="bi bi-check-circle text-success" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+            <p style="font-size: 1.1rem; margin-bottom: 0;">Thank you for your message! We will get back to you soon.</p>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    const bsModal = new bootstrap.Modal(modal);
+    bsModal.show();
+    modal.addEventListener('hidden.bs.modal', () => modal.remove());
   }
 
   // admin panel -----------------------------------------------------------
@@ -284,7 +382,7 @@
     if (!document.body.classList.contains('admin-panel')) return;
     checkSession();
     const loginForm = document.getElementById('admin-login-form');
-    const dashboard = document.getElementById('admin-dashboard');
+    const dashboard = document.getElementById('dashboard-box'); // corrected ID
     if (loginForm) {
       loginForm.addEventListener('submit', function(e){
         e.preventDefault();
@@ -312,7 +410,9 @@
     if (s.loggedIn && s.start && (Date.now() - s.start) < SESSION_TIMEOUT_MS) {
       showDashboard();
     } else {
-      logout();
+      // clear any expired or invalid session, but don't trigger reload loop
+      sessionStorage.removeItem(ADMIN_SESSION_KEY);
+      // the login form remains visible by default
     }
   }
 
@@ -343,7 +443,7 @@
     const contacts = loadContacts();
     contacts.forEach((c,i) => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${c.name}</td><td>${c.email}</td><td>${c.phone||''}</td><td>${formatTime(c.timestamp)}</td><td>${c.message}</td><td><button class="btn btn-sm btn-danger" data-index="${i}">Delete</button></td>`;
+      tr.innerHTML = `<td>${c.name}</td><td>${c.email}</td><td>${c.company||''}</td><td>${c.service||''}</td><td>${c.phone||''}</td><td>${formatTime(c.timestamp)}</td><td>${c.message}</td><td><button class="btn btn-sm btn-danger" data-index="${i}">Delete</button></td>`;
       tbody.appendChild(tr);
     });
     tbody.querySelectorAll('button[data-index]').forEach(btn=>{

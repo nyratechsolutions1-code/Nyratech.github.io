@@ -228,72 +228,9 @@
       }
     })
   }
-  /**
-   * Contact Form Validation
-   */
-  const contactForm = document.querySelector('#contact form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const name = contactForm.querySelector('input[name="name"]');
-      const email = contactForm.querySelector('input[name="email"]');
-      const service = contactForm.querySelector('select[name="service"]');
-      const message = contactForm.querySelector('textarea[name="message"]');
-      
-      let isValid = true;
-      
-      // Reset previous errors
-      contactForm.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-      
-      // Validate name
-      if (!name.value.trim()) {
-        showError(name, 'Full Name is required');
-        isValid = false;
-      }
-      
-      // Validate email
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!email.value.trim()) {
-        showError(email, 'Email Address is required');
-        isValid = false;
-      } else if (!emailRegex.test(email.value)) {
-        showError(email, 'Please enter a valid email address');
-        isValid = false;
-      }
-      
-      // Validate service
-      if (!service.value) {
-        showError(service, 'Please select a service interest');
-        isValid = false;
-      }
-      
-      // Validate message
-      if (!message.value.trim()) {
-        showError(message, 'Message is required');
-        isValid = false;
-      }
-      
-      if (isValid) {
-        // Submit form (you can add AJAX submission here)
-        alert('Thank you for your message! We will get back to you soon.');
-        contactForm.reset();
-      }
-    });
-  }
-  
-  function showError(element, message) {
-    let errorDiv = element.parentNode.querySelector('.error-message');
-    if (!errorDiv) {
-      errorDiv = document.createElement('div');
-      errorDiv.className = 'error-message';
-      errorDiv.style.color = 'red';
-      errorDiv.style.fontSize = '14px';
-      errorDiv.style.marginTop = '5px';
-      element.parentNode.appendChild(errorDiv);
-    }
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-  }
+  // the chatbot.js script now handles contact submissions and validation.
+  // This block previously implemented its own validation and alert, which
+  // conflicted with the chatbot behaviour. It has been removed so that the
+  // form is managed solely by chatbot.js and no browser alert appears.
 
 })();
