@@ -91,7 +91,8 @@ h6 {
 ------------------------------*/
 .php-email-form .error-message {
   display: none;
-  background: #df1529;
+  /* use accent color instead of red to match site theme */
+  background: var(--accent-color);
   color: #ffffff;
   text-align: left;
   padding: 15px;
@@ -101,8 +102,9 @@ h6 {
 
 .php-email-form .sent-message {
   display: none;
+  /* primary blue instead of green so modals/colors all align */
   color: #ffffff;
-  background: #059652;
+  background: var(--accent-color);
   text-align: center;
   padding: 15px;
   margin-bottom: 24px;
@@ -2936,25 +2938,32 @@ section,
 .message {
   margin-bottom: 10px;
   display: flex;
+  flex-direction: column;
+}
+
+.message.bot {
+  align-items: flex-start;
+}
+.message.user {
+  align-items: flex-end;
 }
 
 .message.bot .bubble {
   background: #e9ecef;
   color: #212529;
-  align-self: flex-start;
 }
 
 .message.user .bubble {
   background: var(--accent-color);
   color: var(--contrast-color);
-  align-self: flex-end;
 }
 
 .bubble {
   padding: 8px 12px;
   border-radius: 15px;
   max-width: 80%;
-  position: relative;
+  word-wrap: break-word;
+  word-break: break-word;
   font-size: 0.9rem;
 }
 

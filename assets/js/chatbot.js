@@ -40,8 +40,9 @@
   function loadSuggestions() {
     try {
       const stored = JSON.parse(localStorage.getItem(SUGGESTED_KEY));
-      if (Array.isArray(stored)) return stored;
+      if (Array.isArray(stored) && stored.length > 0) return stored;
     } catch (e) {}
+    // if nothing stored yet or stored array is empty, reset to defaults
     localStorage.setItem(SUGGESTED_KEY, JSON.stringify(defaultSuggestions));
     return defaultSuggestions.slice();
   }
@@ -278,8 +279,13 @@
     if (!form) return;
     let isSubmitting = false;
 
-    form.addEventListener('submit', function(e) {
+    // Use a capturing listener so we can stop other non-capturing listeners
+    // (such as the vendor php-email-form validator) from also handling submit.
+    function handleChatbotSubmit(e) {
       e.preventDefault();
+      // prevent other listeners from running (stop propagation to bubble phase)
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      if (e.stopPropagation) e.stopPropagation();
 
       if (isSubmitting) return;
       isSubmitting = true;
@@ -327,7 +333,14 @@
       }
 
       isSubmitting = false;
-    });
+      // small timeout to signal submission complete
+      setTimeout(()=>{
+        try { form.dispatchEvent(new Event('chatbot:submitted')); } catch(e){}
+      }, 50);
+    }
+
+    // attach as capturing listener so it runs before bubble listeners and can block them
+    form.addEventListener('submit', handleChatbotSubmit, true);
   }
 
   function showValidationErrorModal(message) {
@@ -344,16 +357,16 @@
     modal.innerHTML = `
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header bg-danger text-white border-0">
+          <div class="modal-header bg-primary text-white border-0">
             <h5 class="modal-title">Error</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-center py-4">
-            <i class="bi bi-exclamation-circle text-danger" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+            <i class="bi bi-exclamation-circle text-primary" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
             <p style="font-size: 1rem; margin-bottom: 0;">${message}</p>
           </div>
           <div class="modal-footer border-0">
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
@@ -378,16 +391,16 @@
     modal.innerHTML = `
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-          <div class="modal-header bg-success text-white border-0">
+          <div class="modal-header bg-primary text-white border-0">
             <h5 class="modal-title">Thank You!</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body text-center py-4">
-            <i class="bi bi-check-circle text-success" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+            <i class="bi bi-check-circle text-primary" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
             <p style="font-size: 1.1rem; margin-bottom: 0;">Thank you for your message! We will get back to you soon.</p>
           </div>
           <div class="modal-footer border-0">
-            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
