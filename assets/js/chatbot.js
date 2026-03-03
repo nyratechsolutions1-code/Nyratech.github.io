@@ -23,8 +23,45 @@
     "Tell me about NyraTech"
   ];
 
+  // server-backed storage state
+  let usingServer = false;
+  let serverData = null;
+  const SERVER_ENDPOINT = '/api/data'; // POST/GET JSON
+
+  function initServerStorage() {
+    return fetch(SERVER_ENDPOINT)
+      .then(r=>{
+        if (!r.ok) throw new Error('no server response');
+        return r.json();
+      })
+      .then(obj=>{
+        serverData = obj || {};
+        usingServer = true;
+      })
+      .catch(err=>{
+        console.warn('server storage unavailable', err);
+        usingServer = false;
+      });
+  }
+
+  function syncServer() {
+    if (!usingServer || !serverData) return;
+    fetch(SERVER_ENDPOINT, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(serverData)
+    }).catch(e=>console.error('sync failed', e));
+  }
+
   // storage helpers -------------------------------------------------------
+  // The module now supports exporting/importing all store data to a text file
+  // from the admin panel. LocalStorage remains the primary store but is backed
+  // up when the user exports, and can be restored from a .txt file on import.
+
   function loadBotResponses() {
+    if (usingServer && serverData && serverData.botResponses) {
+      return serverData.botResponses;
+    }
     try {
       const stored = JSON.parse(localStorage.getItem(BOT_RESPONSES_KEY));
       if (stored && typeof stored === 'object') return stored;
@@ -34,10 +71,18 @@
   }
 
   function saveBotResponses(obj) {
+    if (usingServer) {
+      serverData = serverData || {};
+      serverData.botResponses = obj;
+      syncServer();
+    }
     try { localStorage.setItem(BOT_RESPONSES_KEY, JSON.stringify(obj)); } catch (e) {}
   }
 
   function loadSuggestions() {
+    if (usingServer && serverData && Array.isArray(serverData.suggestions)) {
+      return serverData.suggestions;
+    }
     try {
       const stored = JSON.parse(localStorage.getItem(SUGGESTED_KEY));
       if (Array.isArray(stored) && stored.length > 0) return stored;
@@ -48,10 +93,18 @@
   }
 
   function saveSuggestions(arr) {
+    if (usingServer) {
+      serverData = serverData || {};
+      serverData.suggestions = arr;
+      syncServer();
+    }
     try { localStorage.setItem(SUGGESTED_KEY, JSON.stringify(arr)); } catch (e) {}
   }
 
   function loadContacts() {
+    if (usingServer && serverData && Array.isArray(serverData.contacts)) {
+      return serverData.contacts;
+    }
     try {
       const stored = JSON.parse(localStorage.getItem(CONTACTS_KEY));
       if (Array.isArray(stored)) return stored;
@@ -60,6 +113,11 @@
   }
 
   function saveContacts(arr) {
+    if (usingServer) {
+      serverData = serverData || {};
+      serverData.contacts = arr;
+      syncServer();
+    }
     try { localStorage.setItem(CONTACTS_KEY, JSON.stringify(arr)); } catch (e) {}
   }
 
@@ -106,12 +164,80 @@
     return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   }
 
+  // export/import helpers --------------------------------------------------
+  // collects current data into a single object for export
+  function collectAllData() {
+    if (usingServer && serverData) {
+      // clone to avoid mutation
+      return JSON.parse(JSON.stringify(serverData));
+    }
+    return {
+      botResponses: loadBotResponses(),
+      suggestions: loadSuggestions(),
+      contacts: loadContacts(),
+      siteHits: loadHits()
+    };
+  }
+
+  function exportData() {
+    const data = collectAllData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'chatbot-data.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function importDataFromFile(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const obj = JSON.parse(e.target.result);
+        if (obj.botResponses) localStorage.setItem(BOT_RESPONSES_KEY, JSON.stringify(obj.botResponses));
+        if (obj.suggestions) localStorage.setItem(SUGGESTED_KEY, JSON.stringify(obj.suggestions));
+        if (obj.contacts) localStorage.setItem(CONTACTS_KEY, JSON.stringify(obj.contacts));
+        if (obj.siteHits != null) localStorage.setItem(SITE_HITS_KEY, String(obj.siteHits));
+        // refresh UI
+        updateSuggestionButtons();
+        updateBadgeCount();
+        updateHitsDisplay();
+        alert('Data imported successfully.');
+      } catch (err) {
+        console.error('import error', err);
+        alert('Could not parse import file.');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function promptImport() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.txt,.json';
+    input.onchange = function() {
+      if (input.files.length) importDataFromFile(input.files[0]);
+    };
+    input.click();
+  }
+
   // site hit counter ------------------------------------------------------
   function loadHits() {
+    if (usingServer && serverData && typeof serverData.siteHits === 'number') {
+      return serverData.siteHits;
+    }
     const h = parseInt(localStorage.getItem(SITE_HITS_KEY), 10);
     return isNaN(h) ? 0 : h;
   }
   function saveHits(n) {
+    if (usingServer) {
+      serverData = serverData || {};
+      serverData.siteHits = n;
+      syncServer();
+    }
     try { localStorage.setItem(SITE_HITS_KEY, String(n)); } catch (e) {}
   }
   function incrementHits() {
@@ -130,6 +256,8 @@
   let chatWindow, chatButton;
 
   function createChatUI() {
+    // ensure styles for chat window exist (responsive/mobile friendly)
+    applyChatStyles();
     // button
     chatButton = document.createElement('div');
     chatButton.id = 'chatbot-button';
@@ -271,6 +399,86 @@
       document.removeEventListener('mousemove', onDrag);
       document.removeEventListener('mouseup', onDrop);
     }
+  }
+
+
+  // chat style injection --------------------------------------------------
+  function applyChatStyles() {
+    if (document.getElementById('chatbot-style')) return; // only once
+    const style = document.createElement('style');
+    style.id = 'chatbot-style';
+    style.textContent = `
+      #chatbot-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background:#007bff;
+        border-radius:50%;
+        width:50px;
+        height:50px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        cursor:pointer;
+        z-index:10000;
+      }
+      #chatbot-window {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 350px;
+        max-width: 90%;
+        height: 500px;
+        max-height: 90%;
+        background: #fff;
+        border: 1px solid #ccc;
+        display: none;
+        flex-direction: column;
+        z-index:10000;
+        box-shadow: 0 0 10px rgba(0,0,0,.2);
+      }
+      #chatbot-window #chatbot-messages {
+        flex:1;
+        overflow-y:auto;
+        padding:10px;
+      }
+      #chatbot-window #chatbot-input-area {
+        display:flex;
+        border-top:1px solid #ddd;
+        padding:5px;
+      }
+      #chatbot-window #chatbot-input-area input {
+        flex:1;
+        padding:5px;
+      }
+      #chatbot-window #chatbot-input-area .send-button {
+        margin-left:5px;
+      }
+      #chatbot-suggestions {
+        padding:5px;
+        display:flex;
+        flex-wrap:wrap;
+        gap:5px;
+      }
+      #chatbot-suggestions button {
+        flex:1 1 auto;
+        padding:4px 6px;
+        font-size:0.9rem;
+        white-space:normal;
+      }
+      /* responsive adjustments */
+      @media (max-width: 600px) {
+        #chatbot-button { bottom:10px; right:10px; }
+        #chatbot-window {
+          bottom:0;
+          right:0;
+          width:100%;
+          height:100%;
+          border-radius:0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   // contact form ----------------------------------------------------------
@@ -432,6 +640,18 @@
     }
     if (dashboard) {
       document.getElementById('logout-btn').addEventListener('click', logout);
+      // add export / import buttons if not already present
+      if (!document.getElementById('export-data-btn')) {
+        const ctrlDiv = document.createElement('div');
+        ctrlDiv.className = 'mb-3';
+        ctrlDiv.innerHTML = `
+          <button id="export-data-btn" class="btn btn-sm btn-secondary me-2">Export Data</button>
+          <button id="import-data-btn" class="btn btn-sm btn-secondary">Import Data</button>
+        `;
+        dashboard.insertBefore(ctrlDiv, dashboard.firstChild);
+        document.getElementById('export-data-btn').addEventListener('click', exportData);
+        document.getElementById('import-data-btn').addEventListener('click', promptImport);
+      }
       // load tabs content
       loadContactsTable();
       loadBotResponsesEditor();
@@ -593,7 +813,30 @@
   }
 
   // run init
-  document.addEventListener('DOMContentLoaded', function() {
+  async function tryLoadFileBackup() {
+    try {
+      const resp = await fetch('chatbot-data.txt');
+      if (!resp.ok) return;
+      const text = await resp.text();
+      const obj = JSON.parse(text);
+      if (obj) {
+        if (obj.botResponses) localStorage.setItem(BOT_RESPONSES_KEY, JSON.stringify(obj.botResponses));
+        if (obj.suggestions) localStorage.setItem(SUGGESTED_KEY, JSON.stringify(obj.suggestions));
+        if (obj.contacts) localStorage.setItem(CONTACTS_KEY, JSON.stringify(obj.contacts));
+        if (obj.siteHits != null) localStorage.setItem(SITE_HITS_KEY, String(obj.siteHits));
+      }
+    } catch (e) {
+      // silent if file missing or invalid
+      console.debug('no backup file or invalid format');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    // initialise server-backed store if available
+    await initServerStorage();
+    // if a static backup file exists, load its contents too (optional)
+    await tryLoadFileBackup();
+
     // increment hit counter each page load
     incrementHits();
 

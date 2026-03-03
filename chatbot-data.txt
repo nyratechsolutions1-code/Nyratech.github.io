@@ -1,0 +1,16 @@
+{
+  "botResponses": {
+    "What services do you offer?": "We provide enterprise software development, AI solutions, cloud engineering, and custom web applications.",
+    "How can I contact you?": "You can reach us at +91 8928629182 or email NehaSingh@nyratechsolutions.com",
+    "What technologies do you use?": "We work with React, Node.js, Python, AI/ML frameworks, and cloud platforms like AWS and Azure.",
+    "Where are you located?": "We're based in Pune/PCMC, Maharashtra, India.",
+    "Tell me about NyraTech": "NyraTech Solutions is a technology company specializing in enterprise software, AI, and cloud solutions. We're pioneers in Human-AI collaboration."
+  },
+  "suggestions": [
+    "What services do you offer?",
+    "How can I contact you?",
+    "Tell me about NyraTech"
+  ],
+  "contacts": [],
+  "siteHits": 0
+}
