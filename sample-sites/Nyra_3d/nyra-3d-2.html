@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NYRA Tech solutions Kadav — AI Interface</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { overflow-y: scroll; }
+    body { width: 100%; background: #000; font-family: 'Courier New', monospace; color: #fff; cursor: none; }
+    #scroll-container { height: 3500vh; pointer-events: none; }
+    canvas { display: block; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
+
+    .hud-text { font-family: 'Courier New', monospace; letter-spacing: 0.15em; text-transform: uppercase; }
+
+    /* ── Hero overlay ── */
+    #subtitle {
+      position: fixed; left: 0; right: 0; top: 60%; text-align: center;
+      font-size: clamp(0.6rem, 1.1vw, 0.82rem); font-weight: 300;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(255, 17, 0, 0.7); opacity: 0;
+      pointer-events: none; user-select: none; z-index: 10;
+      font-family: 'Courier New', monospace;
+    }
+    #subtitle .sep { display: inline-block; margin: 0 0.7em; opacity: 0.4; font-weight: 100; }
+
+    /* ── Section overlays ── */
+    .section-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; opacity: 0; z-index: 20;
+      display: flex; align-items: center; transition: opacity 0.5s ease;
+    }
+    .section-overlay.active { pointer-events: auto; }
+
+    /* ── About overlay ── */
+    #about-overlay .content { padding: 5vh 6vw; max-width: 38vw; }
+    #about-overlay h2 {
+      font-size: clamp(1.8rem, 3.5vw, 3rem); font-weight: 700;
+      letter-spacing: 0.1em; margin-bottom: 0.5em;
+      background: linear-gradient(135deg, #ff1100 0%, #ff4400 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      font-family: 'Courier New', monospace; text-transform: uppercase;
+    }
+    #about-overlay p {
+      font-size: clamp(0.85rem, 1.1vw, 1.05rem); font-weight: 300;
+      line-height: 1.75; color: rgba(255, 255, 255, 0.65); margin-bottom: 1em;
+    }
+    #about-overlay .tags { display: flex; gap: 0.6em; flex-wrap: wrap; }
+    #about-overlay .tag {
+      padding: 0.3em 0.8em; border: 1px solid rgba(255, 17, 0, 0.3);
+      border-radius: 0; font-size: 0.72rem; letter-spacing: 0.08em;
+      text-transform: uppercase; color: rgba(255, 34, 0, 0.8);
+      font-family: 'Courier New', monospace;
+    }
+
+    /* ── Services overlay ── */
+    #services-overlay { justify-content: center; align-items: flex-end; padding-bottom: 8vh; }
+    #services-overlay h2 {
+      text-align: center; width: 100%;
+      font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 600;
+      letter-spacing: 0.1em; color: rgba(255, 17, 0, 0.85);
+      font-family: 'Courier New', monospace; text-transform: uppercase;
+    }
+
+    /* ── Portfolio overlay ── */
+    #portfolio-overlay { justify-content: center; align-items: flex-end; padding-bottom: 8vh; }
+    #portfolio-overlay h2 {
+      text-align: center; width: 100%;
+      font-size: clamp(1.4rem, 2.5vw, 2.2rem); font-weight: 600;
+      letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.85);
+      font-family: 'Courier New', monospace; text-transform: uppercase;
+    }
+    #portfolio-overlay .project-detail {
+      position: fixed; top: 50%; right: 6vw; transform: translateY(-50%);
+      max-width: 28vw; background: rgba(10, 0, 0, 0.9);
+      backdrop-filter: blur(20px); border: 1px solid rgba(255, 17, 0, 0.2);
+      border-radius: 0; padding: 2em; opacity: 0;
+      pointer-events: none; transition: opacity 0.4s ease;
+    }
+    #portfolio-overlay .project-detail.visible { opacity: 1; pointer-events: auto; }
+    #portfolio-overlay .project-detail h3 { font-size: 1.3rem; margin-bottom: 0.5em; color: #ff2200; }
+    #portfolio-overlay .project-detail p {
+      font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); line-height: 1.6; margin-bottom: 0.8em;
+    }
+    #portfolio-overlay .project-detail .tech { display: flex; gap: 0.5em; flex-wrap: wrap; }
+    #portfolio-overlay .project-detail .tech span {
+      font-size: 0.68rem; padding: 0.2em 0.6em;
+      background: rgba(255, 17, 0, 0.12); border-radius: 0;
+      color: #ff2200; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    /* ── Stats overlay ── */
+    #stats-overlay {
+      justify-content: center; align-items: center; flex-direction: column; text-align: center;
+    }
+    #stats-overlay h2 {
+      font-size: clamp(1.6rem, 3vw, 2.6rem); font-weight: 700;
+      margin-bottom: 1em; color: rgba(255, 17, 0, 0.9);
+      font-family: 'Courier New', monospace; text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+    .stats-grid {
+      display: flex; gap: 3em; flex-wrap: wrap; justify-content: center;
+    }
+    .stat-item { text-align: center; }
+    .stat-value {
+      font-size: 2.2rem; font-weight: 700; color: #ff2200;
+      font-family: 'Courier New', monospace;
+    }
+    .stat-label {
+      font-size: 0.75rem; color: rgba(255, 255, 255, 0.5);
+      letter-spacing: 0.1em; text-transform: uppercase; margin-top: 0.3em;
+    }
+
+    /* ── Contact overlay ── */
+    #contact-overlay {
+      justify-content: center; align-items: center; flex-direction: column; text-align: center;
+    }
+    #contact-overlay h2 {
+      font-size: clamp(1.2rem, 2vw, 1.6rem); font-weight: 300;
+      color: rgba(255, 17, 0, 0.5); letter-spacing: 0.15em;
+      text-transform: uppercase; margin-bottom: 2em;
+      font-family: 'Courier New', monospace;
+    }
+    .contact-links { display: flex; gap: 2em; margin-top: 1em; }
+    .contact-links a {
+      color: rgba(255, 255, 255, 0.7); text-decoration: none;
+      font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 0.6em 1.4em; border: 1px solid rgba(255, 17, 0, 0.25);
+      border-radius: 0; transition: all 0.3s ease;
+      font-family: 'Courier New', monospace;
+    }
+    .contact-links a:hover {
+      color: #ff2200; border-color: rgba(255, 17, 0, 0.6);
+      background: rgba(255, 17, 0, 0.08); box-shadow: 0 0 15px rgba(255, 17, 0, 0.2);
+    }
+
+    /* ── Nav dots ── */
+    #nav-dots {
+      position: fixed; right: 1.5em; top: 50%; transform: translateY(-50%);
+      z-index: 30; display: flex; flex-direction: column; gap: 1em;
+    }
+    .nav-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: rgba(255, 17, 0, 0.2); cursor: pointer;
+      transition: all 0.3s ease; pointer-events: auto;
+    }
+    .nav-dot.active { background: rgba(255, 17, 0, 0.8); transform: scale(1.4); box-shadow: 0 0 8px rgba(255, 17, 0, 0.5); }
+    .nav-dot:hover { background: rgba(255, 17, 0, 0.5); }
+
+    /* ── Custom cursor ── */
+    #custom-cursor {
+      position: fixed; width: 20px; height: 20px;
+      border: 1.5px solid rgba(255, 17, 0, 0.6); border-radius: 50%;
+      pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+      transition: transform 0.15s ease, border-color 0.2s ease, width 0.2s ease, height 0.2s ease;
+      box-shadow: 0 0 8px rgba(255, 17, 0, 0.3);
+    }
+    #custom-cursor.hover { width: 40px; height: 40px; border-color: rgba(204, 0, 0, 0.8); box-shadow: 0 0 15px rgba(255, 17, 0, 0.5); }
+
+    /* ── FPS counter ── */
+    #fps { position: fixed; top: 8px; left: 8px; font-size: 11px; color: rgba(255,17,0,0.3); z-index: 100; font-family: monospace; display: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      #about-overlay .content { max-width: 85vw; padding: 3vh 5vw; }
+      #portfolio-overlay .project-detail { max-width: 80vw; right: 50%; transform: translate(50%, -50%); }
+      .stats-grid { gap: 1.5em; }
+      #nav-dots { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="scroll-container"></div>
+<canvas id="canvas"></canvas>
+<div id="fps"></div>
+<div id="custom-cursor"></div>
+
+<!-- Hero overlay -->
+<p id="subtitle">System Architect<span class="sep">//</span>AI Interface Engineer</p>
+
+<!-- Nav dots -->
+<nav id="nav-dots">
+  <div class="nav-dot active" data-section="0"></div>
+  <div class="nav-dot" data-section="1"></div>
+  <div class="nav-dot" data-section="2"></div>
+  <div class="nav-dot" data-section="3"></div>
+  <div class="nav-dot" data-section="4"></div>
+  <div class="nav-dot" data-section="5"></div>
+</nav>
+
+<!-- About overlay -->
+<div id="about-overlay" class="section-overlay">
+  <div class="content">
+    <h2>// Neural Identity</h2>
+    <p>
+      A systems architect specializing in high-performance interfaces and real-time 3D visualization.
+      Engineering digital experiences that push the boundaries of web technology.
+    </p>
+    <p>
+      Precision-engineered solutions from concept through deployment.
+      Every pixel calculated. Every interaction optimized.
+    </p>
+    <div class="tags">
+      <span class="tag">AI Systems</span>
+      <span class="tag">3D Engine</span>
+      <span class="tag">WebGL</span>
+      <span class="tag">Architecture</span>
+      <span class="tag">Performance</span>
+    </div>
+  </div>
+</div>
+
+<!-- Services overlay -->
+<div id="services-overlay" class="section-overlay">
+  <h2>// Arsenal</h2>
+</div>
+
+<!-- Portfolio overlay -->
+<div id="portfolio-overlay" class="section-overlay">
+  <h2>// Command Center</h2>
+  <div class="project-detail" id="project-detail">
+    <h3 id="proj-title"></h3>
+    <p id="proj-desc"></p>
+    <div class="tech" id="proj-tech"></div>
+  </div>
+</div>
+
+<!-- Stats overlay -->
+<div id="stats-overlay" class="section-overlay">
+  <h2>// System Diagnostics</h2>
+  <div class="stats-grid">
+    <div class="stat-item"><div class="stat-value" id="stat-0">0</div><div class="stat-label">Projects Deployed</div></div>
+    <div class="stat-item"><div class="stat-value" id="stat-1">0%</div><div class="stat-label">Systems Online</div></div>
+    <div class="stat-item"><div class="stat-value" id="stat-2">0</div><div class="stat-label">Code Commits</div></div>
+    <div class="stat-item"><div class="stat-value" id="stat-3">0ms</div><div class="stat-label">Response Time</div></div>
+    <div class="stat-item"><div class="stat-value" id="stat-4">0</div><div class="stat-label">Uptime Hours</div></div>
+  </div>
+</div>
+
+<!-- Contact overlay -->
+<div id="contact-overlay" class="section-overlay">
+  <h2>// Initiate Transmission</h2>
+  <div class="contact-links">
+    <a href="mailto:hello@NYRA Tech solutions.com">Email</a>
+    <a href="https://github.com/NYRA Tech solutions" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://linkedin.com/in/NYRA Tech solutions" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://twitter.com/NYRA Tech solutions" target="_blank" rel="noopener">Twitter</a>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+  import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+  import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+  import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+  import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+  import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+  import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+  import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CONSTANTS & CONFIG
+  // ═══════════════════════════════════════════════════════════════════════════
+  const { gsap, ScrollTrigger } = window;
+  gsap.registerPlugin(ScrollTrigger);
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const PARTICLE_SCALE = isMobile ? 0.4 : 1.0;
+
+  // Section boundaries — 6 sections
+  const SECTIONS = [
+    { name: 'hero',      start: 0.00, end: 0.17 },
+    { name: 'about',     start: 0.17, end: 0.33 },
+    { name: 'services',  start: 0.33, end: 0.50 },
+    { name: 'portfolio', start: 0.50, end: 0.67 },
+    { name: 'stats',     start: 0.67, end: 0.83 },
+    { name: 'contact',   start: 0.83, end: 1.00 },
+  ];
+
+  function getSectionInfo(globalProgress) {
+    const p = Math.max(0, Math.min(1, globalProgress));
+    for (let i = SECTIONS.length - 1; i >= 0; i--) {
+      if (p >= SECTIONS[i].start) {
+        const range = SECTIONS[i].end - SECTIONS[i].start;
+        const local = (p - SECTIONS[i].start) / range;
+        return { index: i, local: Math.min(local, 1), global: p };
+      }
+    }
+    return { index: 0, local: 0, global: 0 };
+  }
+
+  // Portfolio data (AI/tech themed)
+  const PORTFOLIO_ITEMS = [
+    { title: 'Neural Command Interface', desc: 'Real-time AI-driven command center with 3D visualization of network topology and threat analysis.', tech: ['Three.js', 'TensorFlow', 'WebGL', 'Node.js'], color: 0xff1100 },
+    { title: 'Autonomous Drone Swarm UI', desc: 'Multi-agent coordination dashboard rendering thousands of drone trajectories in real-time 3D space.', tech: ['WebGPU', 'WASM', 'React', 'gRPC'], color: 0xff2200 },
+    { title: 'Quantum Cipher Engine', desc: 'Cryptographic visualization platform showing quantum-resistant encryption algorithms in real-time.', tech: ['GLSL', 'Rust', 'WebSocket', 'Canvas'], color: 0xcc0000 },
+    { title: 'Predictive Analytics Core', desc: 'Machine learning pipeline visualization with GPU-accelerated data processing and predictive modeling.', tech: ['Python', 'WebGL', 'D3.js', 'PyTorch'], color: 0xff3300 },
+    { title: 'Biometric Auth System', desc: 'Multi-factor biometric authentication with real-time facial recognition and behavioral analysis.', tech: ['TensorFlow', 'WebRTC', 'Node.js', 'Redis'], color: 0xaa0000 },
+    { title: 'Distributed Mesh Network', desc: 'Decentralized network topology visualizer with real-time node health monitoring and routing optimization.', tech: ['WebRTC', 'Three.js', 'Go', 'libp2p'], color: 0xff0000 },
+  ];
+
+  // Services data
+  const SERVICES = [
+    { name: 'AI Integration', icon: 'brain', desc: 'Neural network implementation and machine learning pipeline optimization.' },
+    { name: '3D Visualization', icon: 'cube', desc: 'Real-time WebGL rendering and immersive 3D experience design.' },
+    { name: 'System Architecture', icon: 'network', desc: 'Scalable distributed systems and microservice orchestration.' },
+    { name: 'Performance Eng.', icon: 'gauge', desc: 'Sub-millisecond optimization and GPU-accelerated computing.' },
+    { name: 'Security Protocols', icon: 'shield', desc: 'Encryption systems and zero-trust architecture implementation.' },
+    { name: 'Data Analytics', icon: 'chart', desc: 'Real-time data processing and predictive analytics dashboards.' },
+  ];
+
+  // Stats data
+  const STATS = [
+    { label: 'Projects Deployed', value: 47, suffix: '+' },
+    { label: 'Systems Online', value: 99.9, suffix: '%' },
+    { label: 'Code Commits', value: 12400, suffix: '' },
+    { label: 'Response Time', value: 12, suffix: 'ms' },
+    { label: 'Uptime Hours', value: 8760, suffix: '' },
+  ];
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SHARED GLSL — Simplex Noise
+  // ═══════════════════════════════════════════════════════════════════════════
+  const SNOISE_GLSL = `
+    vec3 mod289(vec3 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+    vec4 mod289(vec4 x) { return x - floor(x * (1.0/289.0)) * 289.0; }
+    vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+    float snoise(vec3 v) {
+      const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+      const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+      vec3 i = floor(v + dot(v, C.yyy));
+      vec3 x0 = v - i + dot(i, C.xxx);
+      vec3 g = step(x0.yzx, x0.xyz);
+      vec3 l = 1.0 - g;
+      vec3 i1 = min(g.xyz, l.zxy);
+      vec3 i2 = max(g.xyz, l.zxy);
+      vec3 x1 = x0 - i1 + C.xxx;
+      vec3 x2 = x0 - i2 + C.yyy;
+      vec3 x3 = x0 - D.yyy;
+      i = mod289(i);
+      vec4 p = permute(permute(permute(
+        i.z + vec4(0.0, i1.z, i2.z, 1.0))
+        + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+        + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+      float n_ = 0.142857142857;
+      vec3 ns = n_ * D.wyz - D.xzx;
+      vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+      vec4 x_ = floor(j * ns.z);
+      vec4 y_ = floor(j - 7.0 * x_);
+      vec4 x = x_ * ns.x + ns.yyyy;
+      vec4 y = y_ * ns.x + ns.yyyy;
+      vec4 h = 1.0 - abs(x) - abs(y);
+      vec4 b0 = vec4(x.xy, y.xy);
+      vec4 b1 = vec4(x.zw, y.zw);
+      vec4 s0 = floor(b0)*2.0 + 1.0;
+      vec4 s1 = floor(b1)*2.0 + 1.0;
+      vec4 sh = -step(h, vec4(0.0));
+      vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+      vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+      vec3 p0 = vec3(a0.xy, h.x);
+      vec3 p1 = vec3(a0.zw, h.y);
+      vec3 p2 = vec3(a1.xy, h.z);
+      vec3 p3 = vec3(a1.zw, h.w);
+      vec4 norm = taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+      p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+      vec4 m = max(0.6 - vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)), 0.0);
+      m = m * m;
+      return 42.0 * dot(m*m, vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+    }
+  `;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SHARED SHADER FACTORIES
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // 1.1 Ultron AI Core — pulsing sphere with red veins
+  function createUltronCoreMaterial() {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uPulse: { value: 0.2 },
+      },
+      vertexShader: `
+        uniform float uTime;
+        uniform float uPulse;
+        varying vec3 vNormal;
+        varying vec3 vPos;
+        varying vec3 vWorldPos;
+        ${SNOISE_GLSL}
+        void main() {
+          float displacement = snoise(position * 2.0 + uTime * 0.5) * 0.15 * uPulse;
+          vec3 newPos = position + normal * displacement;
+          vNormal = normalize(normalMatrix * normal);
+          vPos = position;
+          vWorldPos = (modelMatrix * vec4(newPos, 1.0)).xyz;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform float uPulse;
+        varying vec3 vNormal;
+        varying vec3 vPos;
+        varying vec3 vWorldPos;
+        void main() {
+          // Red veins pattern
+          float veins = abs(sin(vPos.x * 8.0 + uTime) * sin(vPos.y * 8.0 + uTime * 0.7) * sin(vPos.z * 8.0 + uTime * 0.5));
+          veins = pow(veins, 0.4);
+          // Fresnel rim
+          float fresnel = pow(1.0 - abs(dot(normalize(cameraPosition - vWorldPos), vNormal)), 3.0);
+          // Heartbeat flash
+          float heartbeat = 0.6 + 0.4 * pow(sin(uTime * 3.0) * 0.5 + 0.5, 8.0);
+          vec3 coreColor = vec3(0.05, 0.0, 0.0);
+          vec3 veinColor = vec3(1.0, 0.07, 0.0);
+          vec3 rimColor = vec3(1.0, 0.1, 0.0);
+          vec3 col = mix(coreColor, veinColor, veins * uPulse);
+          col += rimColor * fresnel * 0.8 * uPulse;
+          col *= heartbeat;
+          float emissive = (veins * 0.5 + fresnel * 0.5) * uPulse;
+          gl_FragColor = vec4(col, 0.85 + emissive * 0.15);
+        }
+      `,
+      transparent: true,
+    });
+  }
+
+  // 1.2 Red energy flow material for tubes/tendrils
+  function createRedEnergyMaterial({ speed = 0.8, color1 = '#ff1100', color2 = '#ff4400', opacity = 0.7 } = {}) {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor1: { value: new THREE.Color(color1) },
+        uColor2: { value: new THREE.Color(color2) },
+        uSpeed: { value: speed },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColor1;
+        uniform vec3 uColor2;
+        uniform float uSpeed;
+        varying vec2 vUv;
+        void main() {
+          float flow = fract(vUv.x * 3.0 - uTime * uSpeed);
+          float pulse = smoothstep(0.0, 0.15, flow) * smoothstep(0.4, 0.15, flow);
+          float edge = smoothstep(0.0, 0.3, vUv.y) * smoothstep(1.0, 0.7, vUv.y);
+          vec3 col = mix(uColor1, uColor2, vUv.x);
+          col += vec3(1.0, 0.3, 0.1) * pulse * 0.8;
+          float alpha = (0.3 + pulse * 0.5) * edge * ${opacity.toFixed(1)};
+          gl_FragColor = vec4(col, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+  }
+
+  // 1.3 Dark chrome material wrapper
+  function createDarkChromeMaterial({ color = 0x222222, metalness = 0.95, roughness = 0.15, rimColor = 0xff1100, rimPower = 2.5 } = {}) {
+    const mat = new THREE.MeshStandardMaterial({
+      color, metalness, roughness, envMapIntensity: 1.2,
+    });
+    addNeonRim(mat, new THREE.Color(rimColor), rimPower);
+    return mat;
+  }
+
+  // 1.5 Glitch/Chromatic Aberration post-processing pass
+  function createGlitchPostPass() {
+    return new ShaderPass({
+      uniforms: {
+        tDiffuse: { value: null },
+        uTime: { value: 0 },
+        uIntensity: { value: 0.03 },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }
+      `,
+      fragmentShader: `
+        uniform sampler2D tDiffuse;
+        uniform float uTime;
+        uniform float uIntensity;
+        varying vec2 vUv;
+        float rand(vec2 co) { return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453); }
+        void main() {
+          vec2 uv = vUv;
+          // Chromatic aberration
+          float aberr = uIntensity * 0.01;
+          float r = texture2D(tDiffuse, uv + vec2(aberr, 0.0)).r;
+          float g = texture2D(tDiffuse, uv).g;
+          float b = texture2D(tDiffuse, uv - vec2(aberr, 0.0)).b;
+          vec3 col = vec3(r, g, b);
+          // Scanlines
+          float scanline = sin(uv.y * 800.0) * 0.04 * uIntensity;
+          col -= scanline;
+          // Block glitch
+          float blockY = floor(uv.y * 20.0) / 20.0;
+          float glitchBlock = step(0.98 - uIntensity * 0.3, rand(vec2(blockY, floor(uTime * 10.0))));
+          col.rgb = mix(col.rgb, col.gbr, glitchBlock * uIntensity * 2.0);
+          // Film grain
+          float grain = (rand(uv + fract(uTime)) - 0.5) * uIntensity * 0.15;
+          col += grain;
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `,
+    });
+  }
+
+  // Holographic / HUD material factory (red defaults)
+  function createHoloMaterial({ baseColor = '#0a0a0a', borderColor = '#ff1100', scanSpeed = 1.5, opacity = 0.4 } = {}) {
+    return new THREE.ShaderMaterial({
+      uniforms: {
+        uTime:        { value: 0 },
+        uBaseColor:   { value: new THREE.Color(baseColor) },
+        uBorderColor: { value: new THREE.Color(borderColor) },
+        uOpacity:     { value: opacity },
+        uScanSpeed:   { value: scanSpeed },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          vUv = uv;
+          vNormal = normalize(normalMatrix * normal);
+          vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+          vViewDir = normalize(-mvPos.xyz);
+          gl_Position = projectionMatrix * mvPos;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uBaseColor;
+        uniform vec3 uBorderColor;
+        uniform float uOpacity;
+        uniform float uScanSpeed;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vViewDir;
+        void main() {
+          float fresnel = pow(1.0 - max(dot(vViewDir, vNormal), 0.0), 3.0);
+          float scan = smoothstep(0.4, 0.5, sin(vUv.y * 80.0 - uTime * uScanSpeed));
+          float noise = fract(sin(dot(vUv * 40.0, vec2(12.9898, 78.233))) * 43758.5453);
+          vec3 col = mix(uBaseColor * (0.15 + noise * 0.08), uBorderColor, fresnel * 0.7);
+          col += uBorderColor * scan * 0.12;
+          gl_FragColor = vec4(col, uOpacity + fresnel * 0.3);
+        }
+      `,
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+    });
+  }
+
+  // Animated grid floor shader
+  function createGridFloor(Y, color = 0xff1100) {
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(color) },
+      },
+      vertexShader: `
+        varying vec2 vWorldPos;
+        void main() {
+          vec4 world = modelMatrix * vec4(position, 1.0);
+          vWorldPos = world.xz;
+          gl_Position = projectionMatrix * viewMatrix * world;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColor;
+        varying vec2 vWorldPos;
+        void main() {
+          vec2 grid = abs(fract(vWorldPos * 0.5) - 0.5);
+          float line = min(grid.x, grid.y);
+          float gridAlpha = 1.0 - smoothstep(0.0, 0.04, line);
+          float dist = length(vWorldPos);
+          float pulse = smoothstep(0.0, 0.3, fract(dist * 0.15 - uTime * 0.3))
+                      * smoothstep(0.5, 0.3, fract(dist * 0.15 - uTime * 0.3));
+          float fade = 1.0 - smoothstep(3.0, 12.0, dist);
+          float alpha = (gridAlpha * 0.15 + pulse * 0.08) * fade;
+          gl_FragColor = vec4(uColor, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    });
+    const plane = new THREE.Mesh(new THREE.PlaneGeometry(30, 30, 1, 1), mat);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.y = Y;
+    return { mesh: plane, material: mat };
+  }
+
+  // Neon rim-light injection for MeshStandardMaterial
+  function addNeonRim(material, rimColor = new THREE.Color(0xff1100), rimPower = 2.5) {
+    material.onBeforeCompile = (shader) => {
+      shader.uniforms.uRimColor = { value: rimColor };
+      shader.uniforms.uRimPower = { value: rimPower };
+      shader.uniforms.uTime = { value: 0 };
+      material.userData.shader = shader;
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <common>',
+        `#include <common>
+         varying vec3 vViewDirRim;
+         varying vec3 vNormalRim;`
+      );
+      shader.vertexShader = shader.vertexShader.replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+         vNormalRim = normalize(normalMatrix * normal);
+         vViewDirRim = normalize(-( modelViewMatrix * vec4(position,1.0) ).xyz);`
+      );
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <common>',
+        `#include <common>
+         uniform vec3 uRimColor;
+         uniform float uRimPower;
+         uniform float uTime;
+         varying vec3 vViewDirRim;
+         varying vec3 vNormalRim;`
+      );
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <dithering_fragment>',
+        `#include <dithering_fragment>
+         float rimFresnel = pow(1.0 - max(dot(vViewDirRim, vNormalRim), 0.0), uRimPower);
+         float rimPulse = 0.7 + 0.3 * sin(uTime * 2.0);
+         gl_FragColor.rgb += uRimColor * rimFresnel * rimPulse * 0.6;`
+      );
+    };
+  }
+
+  // GPU particle system with vertex-shader-driven spiral motion
+  function createGPUParticles({ count = 500, spread = 8, Y = 0, color = 0xff1100, size = 3.0 } = {}) {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+    const randoms = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      positions[i*3]   = (Math.random()-0.5) * spread;
+      positions[i*3+1] = Y + (Math.random()-0.5) * spread;
+      positions[i*3+2] = (Math.random()-0.5) * spread;
+      randoms[i*3]   = Math.random();
+      randoms[i*3+1] = Math.random();
+      randoms[i*3+2] = Math.random();
+    }
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 3));
+    const spreadF = spread.toFixed(1);
+    const halfSpreadF = (spread/2).toFixed(1);
+    const mat = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(color) },
+        uSize: { value: size },
+        uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
+      },
+      vertexShader: `
+        attribute vec3 aRandom;
+        uniform float uTime;
+        uniform float uSize;
+        uniform float uPixelRatio;
+        varying float vAlpha;
+        void main() {
+          vec3 pos = position;
+          float angle = uTime * (0.2 + aRandom.x * 0.5) + aRandom.y * 6.28;
+          pos.x += sin(angle) * aRandom.z * 1.5;
+          pos.z += cos(angle) * aRandom.z * 1.5;
+          pos.y += mod(uTime * (0.1 + aRandom.x * 0.3) + aRandom.y * 10.0, ${spreadF}) - ${halfSpreadF};
+          vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
+          gl_PointSize = uSize * uPixelRatio * (200.0 / -mvPos.z) * (0.5 + 0.5 * sin(uTime * 3.0 + aRandom.x * 6.28));
+          gl_Position = projectionMatrix * mvPos;
+          vAlpha = 0.3 + 0.7 * aRandom.x;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 uColor;
+        varying float vAlpha;
+        void main() {
+          float d = length(gl_PointCoord - 0.5);
+          if (d > 0.5) discard;
+          float alpha = smoothstep(0.5, 0.1, d) * vAlpha;
+          gl_FragColor = vec4(uColor, alpha);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    });
+    return { points: new THREE.Points(geo, mat), material: mat };
+  }
+
+  // Track all shader materials that need uTime updates
+  const _shaderTimeUniforms = [];
+  function registerShaderTime(mat) {
+    if (mat.uniforms && mat.uniforms.uTime) _shaderTimeUniforms.push(mat.uniforms.uTime);
+  }
+
+  // Camera shake state
+  let _shakeTimer = 0;
+  let _prevSectionForShake = 0;
+
+  // Custom cursor
+  const cursorEl = document.getElementById('custom-cursor');
+  let _cursorX = 0, _cursorY = 0;
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RENDERER & SCENE
+  // ═══════════════════════════════════════════════════════════════════════════
+  const canvas = document.getElementById('canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.useLegacyLights = false;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x000000);
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 0, 7);
+
+  // ── Environment ──
+  function applyRoomEnv() {
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    pmrem.compileEquirectangularShader();
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.02).texture;
+    pmrem.dispose();
+  }
+  applyRoomEnv();
+  new RGBELoader().load('/assets/hdr/studio.hdr', (tex) => {
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    scene.environment = tex;
+  });
+
+  // ── Post-processing ──
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+
+  const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.6,   // strength (higher for red glow)
+    0.6,   // radius
+    0.7    // threshold (lower catches red emissive)
+  );
+  bloomPass.resolution.set(Math.floor(window.innerWidth/2), Math.floor(window.innerHeight/2));
+  composer.addPass(bloomPass);
+
+  const glitchPass = createGlitchPostPass();
+  if (!reducedMotion) composer.addPass(glitchPass);
+  composer.addPass(new OutputPass());
+
+  // Section-specific bloom & glitch strengths
+  const SECTION_BLOOM = [0.8, 0.5, 0.4, 0.5, 0.6, 0.7];
+  const SECTION_GLITCH = [0.05, 0.02, 0.03, 0.02, 0.04, 0.06];
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CAMERA SPLINE SYSTEM
+  // ═══════════════════════════════════════════════════════════════════════════
+  const cameraPoints = [
+    new THREE.Vector3(0,    0,    3),    // Hero — close to AI core
+    new THREE.Vector3(-3,  -12,   5),    // About — side angle on neural brain
+    new THREE.Vector3(0,   -24,   7),    // Services — pulled back for ring carousel
+    new THREE.Vector3(3,   -36,   5),    // Portfolio — orbital view
+    new THREE.Vector3(0,   -48,   6),    // Stats — centered on gauges
+    new THREE.Vector3(0,   -60,   5),    // Contact — transmission terminal
+  ];
+
+  const lookAtPoints = [
+    new THREE.Vector3(0,    0,    0),
+    new THREE.Vector3(0,   -12,   0),
+    new THREE.Vector3(0,   -24,   0),
+    new THREE.Vector3(0,   -36,   0),
+    new THREE.Vector3(0,   -48,   0),
+    new THREE.Vector3(0,   -60,   0),
+  ];
+
+  const cameraSpline = new THREE.CatmullRomCurve3(cameraPoints);
+  const lookAtSpline = new THREE.CatmullRomCurve3(lookAtPoints);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION GROUPS & CONTROLLERS
+  // ═══════════════════════════════════════════════════════════════════════════
+  const sectionGroups = [];
+  const sectionControllers = [];
+  let currentSectionIndex = 0;
+  let fontReady = null; // will hold the loaded font
+
+  for (let i = 0; i < 6; i++) {
+    const group = new THREE.Group();
+    group.visible = (i <= 1);
+    scene.add(group);
+    sectionGroups.push(group);
+  }
+
+  // Track init state
+  const sectionInited = new Array(6).fill(false);
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION 0: HERO — "AI Awakening"
+  // ═══════════════════════════════════════════════════════════════════════════
+  const heroGroup = sectionGroups[0];
+
+  // Hero lights — white key from above, red spots from sides
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.08);
+  heroGroup.add(ambientLight);
+
+  const keyLight = new THREE.DirectionalLight(0xffffff, 3.0);
+  keyLight.position.set(0, 8, 4);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(2048, 2048);
+  keyLight.shadow.bias = -0.001;
+  heroGroup.add(keyLight);
+
+  const redSpotL = new THREE.SpotLight(0xff1100, 4.0);
+  redSpotL.position.set(-5, 4, 2); redSpotL.angle = 0.4;
+  redSpotL.penumbra = 0.8; redSpotL.decay = 2.0; redSpotL.distance = 20;
+  redSpotL.target.position.set(0, 0, 0);
+  heroGroup.add(redSpotL); heroGroup.add(redSpotL.target);
+
+  const redSpotR = new THREE.SpotLight(0xff2200, 4.0);
+  redSpotR.position.set(5, 4, 2); redSpotR.angle = 0.4;
+  redSpotR.penumbra = 0.8; redSpotR.decay = 2.0; redSpotR.distance = 20;
+  redSpotR.target.position.set(0, 0, 0);
+  heroGroup.add(redSpotR); heroGroup.add(redSpotR.target);
+
+  // AI Core Sphere
+  const coreGeo = new THREE.SphereGeometry(1.2, 64, 64);
+  const coreMat = createUltronCoreMaterial();
+  registerShaderTime(coreMat);
+  const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+  heroGroup.add(coreMesh);
+
+  // Mechanical Iris — 8 ring segments
+  const irisSegments = [];
+  for (let i = 0; i < 8; i++) {
+    const ringGeo = new THREE.RingGeometry(1.5, 2.2, 6, 1, (i / 8) * Math.PI * 2, Math.PI * 2 / 8 - 0.05);
+    const ringMat = createDarkChromeMaterial({ color: 0x1a1a1a, rimColor: 0xff1100 });
+    const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+    ringMesh.position.z = -0.5;
+    ringMesh.userData.baseAngle = (i / 8) * Math.PI * 2;
+    ringMesh.userData.openOffset = 0;
+    heroGroup.add(ringMesh);
+    irisSegments.push(ringMesh);
+  }
+
+  // Red Energy Tendrils — 6 tubes radiating from core
+  const tendrilMeshes = [];
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const pts = [
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(Math.cos(angle) * 1.5, Math.sin(angle * 0.5) * 0.5, Math.sin(angle) * 1.5),
+      new THREE.Vector3(Math.cos(angle) * 3, Math.sin(angle * 0.3 + 1) * 1, Math.sin(angle) * 3),
+      new THREE.Vector3(Math.cos(angle) * 4.5, Math.sin(angle * 0.7) * 0.8, Math.sin(angle) * 4.5),
+    ];
+    const curve = new THREE.CatmullRomCurve3(pts);
+    const tubeGeo = new THREE.TubeGeometry(curve, 40, 0.03, 6, false);
+    const tubeMat = createRedEnergyMaterial({ speed: 0.6 + Math.random() * 0.5 });
+    registerShaderTime(tubeMat);
+    const tube = new THREE.Mesh(tubeGeo, tubeMat);
+    tube.visible = false;
+    heroGroup.add(tube);
+    tendrilMeshes.push(tube);
+  }
+
+  // Hero grid floor
+  const heroGrid = createGridFloor(-2, 0xff1100);
+  heroGroup.add(heroGrid.mesh);
+  registerShaderTime(heroGrid.material);
+
+  // Hero GPU particles (red)
+  const pCount = Math.floor(600 * PARTICLE_SCALE);
+  const heroParticles = createGPUParticles({ count: pCount, spread: 8, Y: 0, color: 0xff1100, size: 2.5 });
+  heroGroup.add(heroParticles.points);
+  registerShaderTime(heroParticles.material);
+
+  // Dark background shader
+  const bgMat = new THREE.ShaderMaterial({
+    uniforms: { uOpacity: { value: 0.0 }, uTime: { value: 0 } },
+    vertexShader: `varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 1.0, 1.0); }`,
+    fragmentShader: `
+      varying vec2 vUv; uniform float uOpacity; uniform float uTime;
+      void main() {
+        vec2 c = vUv - 0.5;
+        float dist = length(c * vec2(1.55, 1.0));
+        vec3 inner = vec3(0.04, 0.01, 0.01);
+        vec3 outer = vec3(0.01, 0.0, 0.0);
+        float tint = sin(uTime * 0.15) * 0.5 + 0.5;
+        vec3 accent = mix(vec3(0.03, 0.0, 0.0), vec3(0.02, 0.005, 0.0), tint);
+        vec3 col = mix(inner + accent, outer, smoothstep(0.0, 0.68, dist));
+        gl_FragColor = vec4(col, uOpacity);
+      }
+    `,
+    transparent: true, depthTest: false, depthWrite: false,
+  });
+  const bgMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), bgMat);
+  bgMesh.renderOrder = -1;
+  heroGroup.add(bgMesh);
+
+  // Hero letter state
+  const WORD = 'NYRA Tech solutions';
+  const LSIZE = 0.95, LDEPTH = 0.30, LGAP = 0.06;
+  const letterState = WORD.split('').map((_, i) => ({
+    opacity: i === 0 ? 1 : 0,
+    oz: i === 0 ? 0 : -1.4,
+  }));
+  const letterMeshes = [];
+  const scroll = { rotY: 0, revealTL: null };
+
+  let irisOpened = false;
+  let subtitleShown = false;
+
+  // Load font
+  const FLOAT_PHASE = [0.00, 1.13, 2.31, 3.57, 4.89, 6.10];
+  const FLOAT_AMP = 0.0042;
+  const FLOAT_SPEED = 0.37;
+  let _envIntensity = 1.4;
+
+  const fontLoader = new FontLoader();
+  fontLoader.load(
+    'https://cdn.jsdelivr.net/npm/three@0.169.0/examples/fonts/helvetiker_regular.typeface.json',
+    (font) => {
+      fontReady = font;
+      const geos = WORD.split('').map(char =>
+        new TextGeometry(char, {
+          font, size: LSIZE, depth: LDEPTH, curveSegments: 32,
+          bevelEnabled: true, bevelThickness: 0.035, bevelSize: 0.022,
+          bevelOffset: 0, bevelSegments: 10,
+        })
+      );
+
+      geos.forEach(g => g.computeBoundingBox());
+      const widths = geos.map(g => g.boundingBox.max.x - g.boundingBox.min.x);
+      const totalW = widths.reduce((a, b) => a + b, 0) + LGAP * (WORD.length - 1);
+      let xCursor = -totalW / 2;
+
+      geos.forEach((geo, i) => {
+        const bb = geo.boundingBox;
+        const lw = bb.max.x - bb.min.x;
+        const lh = bb.max.y - bb.min.y;
+        const ld = bb.max.z - bb.min.z;
+        geo.translate(-(bb.min.x + lw / 2), -(bb.min.y + lh / 2), -(bb.min.z + ld / 2));
+
+        const mat = createDarkChromeMaterial({ color: 0xc8cdd4, rimColor: 0xff1100 });
+        mat.transparent = true;
+        mat.opacity = letterState[i].opacity;
+
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.x = xCursor + lw / 2;
+        mesh.position.z = letterState[i].oz;
+        mesh.castShadow = true;
+        heroGroup.add(mesh);
+        letterMeshes.push(mesh);
+        xCursor += lw + LGAP;
+      });
+
+      const revealTL = gsap.timeline({ paused: true });
+      letterMeshes.forEach((mesh, i) => {
+        if (i === 0) return;
+        const at = 0.10 + (i - 1) * 0.15;
+        revealTL.to(letterState[i], {
+          opacity: 1, oz: 0, duration: 0.20, ease: 'power2.out',
+          onUpdate() {
+            mesh.material.opacity = letterState[i].opacity;
+            mesh.position.z = letterState[i].oz;
+          },
+        }, at);
+      });
+      scroll.revealTL = revealTL;
+
+      if (sectionInited[5]) initContactText();
+    }
+  );
+
+  sectionInited[0] = true;
+
+  // Hero controller
+  sectionControllers[0] = {
+    update(local, elapsed, dt) {
+      // Core pulse: dim early, bright after iris opens
+      const pulseTarget = local < 0.3 ? 0.2 : Math.min((local - 0.3) / 0.3, 1.0);
+      coreMat.uniforms.uPulse.value += (pulseTarget - coreMat.uniforms.uPulse.value) * 0.05;
+      coreMat.uniforms.uTime.value = elapsed;
+      coreMesh.rotation.y = elapsed * 0.1;
+
+      // Iris opening at local 0.3-0.6
+      if (!reducedMotion) {
+        const irisProgress = Math.max(0, Math.min(1, (local - 0.3) / 0.3));
+        irisSegments.forEach((seg, i) => {
+          const openAmt = irisProgress * 1.5;
+          const angle = seg.userData.baseAngle;
+          seg.position.x = Math.cos(angle) * openAmt;
+          seg.position.y = Math.sin(angle) * openAmt;
+          seg.rotation.z = angle + irisProgress * 0.3;
+          seg.material.opacity = 1 - irisProgress * 0.3;
+        });
+      }
+
+      // Show tendrils after iris opens
+      if (local > 0.35) {
+        tendrilMeshes.forEach(t => { t.visible = true; });
+      }
+
+      // Letter reveal in local 0.6-0.85
+      if (scroll.revealTL) {
+        const letterProgress = Math.max(0, Math.min(1, (local - 0.6) / 0.25));
+        scroll.revealTL.progress(letterProgress);
+      }
+
+      // Subtitle at 0.85+
+      if (local >= 0.85 && !subtitleShown) {
+        subtitleShown = true;
+        gsap.to(bgMat.uniforms.uOpacity, { value: 1.0, duration: 2.0, ease: 'power2.inOut' });
+        gsap.fromTo('#subtitle', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 1.8, ease: 'power3.out' });
+      }
+
+      scroll.rotY = local * (Math.PI * 0.17);
+      bgMat.uniforms.uTime.value = elapsed;
+
+      // Letter float + neon rim update
+      if (letterMeshes.length) {
+        for (let i = 0; i < letterMeshes.length; i++) {
+          const mesh = letterMeshes[i];
+          if (mesh.material.opacity < 0.02) continue;
+          mesh.position.y = reducedMotion ? 0 : Math.sin(elapsed * FLOAT_SPEED + FLOAT_PHASE[i]) * FLOAT_AMP;
+          if (mesh.material.userData.shader) {
+            mesh.material.userData.shader.uniforms.uTime.value = elapsed;
+          }
+        }
+      }
+
+      // Fade hero overlays
+      const heroFade = local < 0.7 ? 1 : 1 - (local - 0.7) / 0.3;
+      bgMat.uniforms.uOpacity.value *= heroFade;
+      document.getElementById('subtitle').style.opacity = heroFade * (subtitleShown ? 1 : 0);
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION 1: ABOUT — "Neural Identity"
+  // ═══════════════════════════════════════════════════════════════════════════
+  function initAbout() {
+    const g = sectionGroups[1];
+    const Y = -12;
+
+    // Lights
+    const amb = new THREE.AmbientLight(0x1a0a0a, 0.6);
+    g.add(amb);
+    const redLight = new THREE.PointLight(0xff1100, 3, 18, 1.8);
+    g.add(redLight);
+    g.userData.redLight = redLight;
+
+    // Wireframe Head — IcosahedronGeometry
+    const headGeo = new THREE.IcosahedronGeometry(1.5, 2);
+    const headMat = new THREE.MeshBasicMaterial({
+      color: 0xff1100, wireframe: true, transparent: true, opacity: 0.12,
+    });
+    const headMesh = new THREE.Mesh(headGeo, headMat);
+    headMesh.position.set(2.5, Y, 0);
+    g.add(headMesh);
+    g.userData.headMesh = headMesh;
+
+    // Neural Network — 35 small emissive red spheres as nodes
+    const nodeGeo = new THREE.SphereGeometry(0.06, 8, 8);
+    const neuralNodes = [];
+    const neuralEdges = [];
+    for (let i = 0; i < 35; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
+      const r = 0.8 + Math.random() * 0.5;
+      const pos = new THREE.Vector3(
+        2.5 + r * Math.sin(phi) * Math.cos(theta),
+        Y + r * Math.sin(phi) * Math.sin(theta),
+        r * Math.cos(phi)
+      );
+      const nodeMat = new THREE.MeshBasicMaterial({
+        color: 0xff1100, transparent: true, opacity: 0.8,
+      });
+      const node = new THREE.Mesh(nodeGeo, nodeMat);
+      node.position.copy(pos);
+      g.add(node);
+      neuralNodes.push(node);
+    }
+    // Connect nearby nodes with edges
+    const edgePositions = [];
+    for (let i = 0; i < neuralNodes.length; i++) {
+      for (let j = i + 1; j < neuralNodes.length; j++) {
+        if (neuralNodes[i].position.distanceTo(neuralNodes[j].position) < 0.8) {
+          edgePositions.push(
+            neuralNodes[i].position.x, neuralNodes[i].position.y, neuralNodes[i].position.z,
+            neuralNodes[j].position.x, neuralNodes[j].position.y, neuralNodes[j].position.z
+          );
+          neuralEdges.push([i, j]);
+        }
+      }
+    }
+    const edgeGeo = new THREE.BufferGeometry();
+    edgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
+    const edgeMat = new THREE.LineBasicMaterial({
+      color: 0xff2200, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending,
+    });
+    const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+    g.add(edges);
+    g.userData.neuralNodes = neuralNodes;
+    g.userData.neuralEdges = neuralEdges;
+    g.userData.edges = edges;
+
+    // Chrome fragments — 20 InstancedMesh icosahedrons
+    const fragGeo = new THREE.IcosahedronGeometry(0.12, 0);
+    const fragMat = createDarkChromeMaterial({ color: 0x333333, rimColor: 0xff1100 });
+    const fragCount = 20;
+    const fragMesh = new THREE.InstancedMesh(fragGeo, fragMat, fragCount);
+    const fragData = [];
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < fragCount; i++) {
+      const pos = new THREE.Vector3(
+        (Math.random() - 0.5) * 10, Y + (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 6
+      );
+      const speed = 0.3 + Math.random() * 0.5;
+      const phase = Math.random() * Math.PI * 2;
+      const scale = 0.5 + Math.random() * 1.0;
+      fragData.push({ pos, speed, phase, scale });
+      dummy.position.copy(pos); dummy.scale.setScalar(scale); dummy.updateMatrix();
+      fragMesh.setMatrixAt(i, dummy.matrix);
+    }
+    fragMesh.instanceMatrix.needsUpdate = true;
+    g.add(fragMesh);
+    g.userData.fragMesh = fragMesh;
+    g.userData.fragData = fragData;
+
+    // Red dust particles
+    const dustP = createGPUParticles({ count: Math.floor(200 * PARTICLE_SCALE), spread: 10, Y, color: 0xff1100, size: 2.0 });
+    g.add(dustP.points);
+    registerShaderTime(dustP.material);
+  }
+
+  sectionControllers[1] = {
+    update(local, elapsed, dt) {
+      if (!sectionInited[1]) return;
+      const g = sectionGroups[1];
+      const Y = -12;
+
+      // Rotate wireframe head
+      if (g.userData.headMesh) {
+        g.userData.headMesh.rotation.y = elapsed * 0.08;
+        g.userData.headMesh.rotation.x = Math.sin(elapsed * 0.05) * 0.1;
+      }
+
+      // Pulse neural nodes
+      g.userData.neuralNodes.forEach((node, i) => {
+        node.material.opacity = 0.5 + Math.sin(elapsed * 2.0 + i * 0.5) * 0.3;
+      });
+
+      // Edge pulse
+      if (g.userData.edges) {
+        g.userData.edges.material.opacity = 0.15 + Math.sin(elapsed * 1.5) * 0.1;
+      }
+
+      // Orbit red light
+      const rl = g.userData.redLight;
+      rl.position.set(Math.cos(elapsed * 0.3) * 4 + 2.5, Y + Math.sin(elapsed * 0.2) * 2, Math.sin(elapsed * 0.3) * 4);
+
+      // Animate chrome fragments
+      const fm = g.userData.fragMesh;
+      const fd = g.userData.fragData;
+      const d = new THREE.Object3D();
+      for (let i = 0; i < fd.length; i++) {
+        const c = fd[i];
+        d.position.set(
+          c.pos.x + Math.sin(elapsed * c.speed + c.phase) * 0.3,
+          c.pos.y + Math.sin(elapsed * c.speed * 0.7 + c.phase) * 0.2,
+          c.pos.z + Math.cos(elapsed * c.speed * 0.5 + c.phase) * 0.2
+        );
+        d.rotation.set(elapsed * c.speed, elapsed * c.speed * 0.7, 0);
+        d.scale.setScalar(c.scale);
+        d.updateMatrix();
+        fm.setMatrixAt(i, d.matrix);
+      }
+      fm.instanceMatrix.needsUpdate = true;
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION 2: SERVICES — "Arsenal"
+  // ═══════════════════════════════════════════════════════════════════════════
+  function initServices() {
+    const g = sectionGroups[2];
+    const Y = -24;
+
+    const amb = new THREE.AmbientLight(0x1a0a0a, 0.4);
+    g.add(amb);
+    const dir = new THREE.DirectionalLight(0xffffff, 1.5);
+    dir.position.set(0, Y + 8, 5);
+    g.add(dir);
+
+    // Central small orb
+    const orbGeo = new THREE.SphereGeometry(0.4, 32, 32);
+    const orbMat = createUltronCoreMaterial();
+    registerShaderTime(orbMat);
+    const orb = new THREE.Mesh(orbGeo, orbMat);
+    orb.position.set(0, Y, 0);
+    g.add(orb);
+    g.userData.orbMat = orbMat;
+
+    // Hexagonal grid backdrop — InstancedMesh
+    const hexGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.05, 6);
+    const hexMat = createDarkChromeMaterial({ color: 0x111111, rimColor: 0xff1100, rimPower: 3.0 });
+    const hexCount = 60;
+    const hexMesh = new THREE.InstancedMesh(hexGeo, hexMat, hexCount);
+    const hexDummy = new THREE.Object3D();
+    for (let i = 0; i < hexCount; i++) {
+      const row = Math.floor(i / 10);
+      const col = i % 10;
+      hexDummy.position.set(
+        (col - 5) * 0.5 + (row % 2) * 0.25,
+        Y - 3,
+        (row - 3) * 0.45
+      );
+      hexDummy.updateMatrix();
+      hexMesh.setMatrixAt(i, hexDummy.matrix);
+    }
+    hexMesh.instanceMatrix.needsUpdate = true;
+    g.add(hexMesh);
+
+    // 6 Service panels in rotating ring carousel
+    const panelMeshes = [];
+    SERVICES.forEach((svc, i) => {
+      const angle = (i / SERVICES.length) * Math.PI * 2;
+      const radius = 4;
+
+      const cvs = document.createElement('canvas');
+      cvs.width = 400; cvs.height = 280;
+      const ctx = cvs.getContext('2d');
+
+      // Dark background with circuit border
+      ctx.fillStyle = 'rgba(10, 2, 2, 0.92)';
+      ctx.fillRect(0, 0, 400, 280);
+      ctx.strokeStyle = '#ff1100';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(2, 2, 396, 276);
+      // Circuit pattern corners
+      ctx.strokeStyle = 'rgba(255, 17, 0, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(20, 2); ctx.lineTo(20, 20); ctx.lineTo(2, 20);
+      ctx.moveTo(380, 2); ctx.lineTo(380, 20); ctx.lineTo(398, 20);
+      ctx.moveTo(20, 278); ctx.lineTo(20, 260); ctx.lineTo(2, 260);
+      ctx.moveTo(380, 278); ctx.lineTo(380, 260); ctx.lineTo(398, 260);
+      ctx.stroke();
+      // Scanlines
+      ctx.strokeStyle = 'rgba(255, 17, 0, 0.03)';
+      for (let sy = 0; sy < 280; sy += 4) {
+        ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(400, sy); ctx.stroke();
+      }
+      // Title
+      ctx.fillStyle = '#ff2200';
+      ctx.font = 'bold 22px Courier New, monospace';
+      ctx.fillText(svc.name.toUpperCase(), 24, 50);
+      // Description
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
+      ctx.font = '14px Courier New, monospace';
+      const words = svc.desc.split(' ');
+      let line = '', lineY = 85;
+      words.forEach(w => {
+        const test = line + w + ' ';
+        if (ctx.measureText(test).width > 350) {
+          ctx.fillText(line, 24, lineY); line = w + ' '; lineY += 20;
+        } else { line = test; }
+      });
+      ctx.fillText(line, 24, lineY);
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      const cardGeo = new THREE.BoxGeometry(2.0, 1.4, 0.04);
+      const holoSide = createHoloMaterial({ borderColor: '#ff1100', opacity: 0.3 });
+      registerShaderTime(holoSide);
+      const frontMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.3, metalness: 0.1, transparent: true });
+      addNeonRim(frontMat, new THREE.Color(0xff1100), 2.0);
+      const mats = [holoSide, holoSide, holoSide, holoSide, frontMat, holoSide];
+      const mesh = new THREE.Mesh(cardGeo, mats);
+      mesh.position.set(Math.cos(angle) * radius, Y, Math.sin(angle) * radius);
+      mesh.lookAt(0, Y, 0);
+      mesh.rotation.y += Math.PI;
+      mesh.userData.baseAngle = angle;
+      g.add(mesh);
+      panelMeshes.push(mesh);
+    });
+    g.userData.panelMeshes = panelMeshes;
+
+    // Connector beams between panels
+    const beamGeo = new THREE.BufferGeometry();
+    const beamPos = [];
+    for (let i = 0; i < panelMeshes.length; i++) {
+      const next = (i + 1) % panelMeshes.length;
+      beamPos.push(panelMeshes[i].position.x, panelMeshes[i].position.y, panelMeshes[i].position.z);
+      beamPos.push(panelMeshes[next].position.x, panelMeshes[next].position.y, panelMeshes[next].position.z);
+    }
+    beamGeo.setAttribute('position', new THREE.Float32BufferAttribute(beamPos, 3));
+    const beamMat = new THREE.LineBasicMaterial({ color: 0xff1100, transparent: true, opacity: 0.2, blending: THREE.AdditiveBlending });
+    const beams = new THREE.LineSegments(beamGeo, beamMat);
+    g.add(beams);
+    g.userData.beams = beams;
+  }
+
+  sectionControllers[2] = {
+    update(local, elapsed, dt) {
+      if (!sectionInited[2]) return;
+      const g = sectionGroups[2];
+      const Y = -24;
+
+      // Rotate carousel
+      const rot = local * Math.PI * 2;
+      const panels = g.userData.panelMeshes;
+      const radius = 4;
+      panels.forEach((mesh, i) => {
+        const angle = mesh.userData.baseAngle + rot;
+        mesh.position.x = Math.cos(angle) * radius;
+        mesh.position.z = Math.sin(angle) * radius;
+        mesh.lookAt(0, Y, 0);
+        mesh.rotation.y += Math.PI;
+        if (mesh.material[0] && mesh.material[0].uniforms) mesh.material[0].uniforms.uTime.value = elapsed;
+        if (mesh.material[4] && mesh.material[4].userData.shader) mesh.material[4].userData.shader.uniforms.uTime.value = elapsed;
+      });
+
+      // Update core
+      if (g.userData.orbMat) g.userData.orbMat.uniforms.uTime.value = elapsed;
+
+      // Update beams
+      if (g.userData.beams) {
+        const bp = g.userData.beams.geometry.attributes.position.array;
+        panels.forEach((mesh, i) => {
+          const next = (i + 1) % panels.length;
+          bp[i * 6] = mesh.position.x; bp[i * 6 + 1] = mesh.position.y; bp[i * 6 + 2] = mesh.position.z;
+          bp[i * 6 + 3] = panels[next].position.x; bp[i * 6 + 4] = panels[next].position.y; bp[i * 6 + 5] = panels[next].position.z;
+        });
+        g.userData.beams.geometry.attributes.position.needsUpdate = true;
+        g.userData.beams.material.opacity = 0.15 + Math.sin(elapsed * 2) * 0.08;
+      }
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION 3: PORTFOLIO — "Command Center"
+  // ═══════════════════════════════════════════════════════════════════════════
+  function initPortfolio() {
+    const g = sectionGroups[3];
+    const Y = -36;
+
+    const amb = new THREE.AmbientLight(0xffffff, 0.3);
+    g.add(amb);
+    const dir = new THREE.DirectionalLight(0xffffff, 1.5);
+    dir.position.set(0, Y + 8, 5);
+    g.add(dir);
+
+    // Central red plasma orb
+    const orbGeo = new THREE.SphereGeometry(0.5, 32, 32);
+    const orbMat = createUltronCoreMaterial();
+    registerShaderTime(orbMat);
+    const orb = new THREE.Mesh(orbGeo, orbMat);
+    orb.position.set(0, Y, 0);
+    g.add(orb);
+    g.userData.orbMat = orbMat;
+
+    // HUD rings
+    const hudRings = [];
+    [3.5, 5.0, 6.0].forEach((r, i) => {
+      const rGeo = new THREE.TorusGeometry(r, 0.015, 8, 80);
+      const rMat = new THREE.MeshBasicMaterial({
+        color: [0xff1100, 0xff2200, 0xcc0000][i],
+        transparent: true, opacity: 0.12, blending: THREE.AdditiveBlending,
+      });
+      const ring = new THREE.Mesh(rGeo, rMat);
+      ring.position.set(0, Y, 0);
+      ring.rotation.x = Math.PI / 2 + i * 0.15;
+      g.add(ring); hudRings.push(ring);
+    });
+    g.userData.hudRings = hudRings;
+
+    // Project cards in helix
+    const cardMeshes = [];
+    PORTFOLIO_ITEMS.forEach((proj, i) => {
+      const angle = (i / PORTFOLIO_ITEMS.length) * Math.PI * 2;
+      const radius = 4;
+      const yOffset = (i - PORTFOLIO_ITEMS.length / 2) * 1.2;
+
+      const cvs = document.createElement('canvas');
+      cvs.width = 480; cvs.height = 320;
+      const ctx = cvs.getContext('2d');
+      ctx.fillStyle = 'rgba(10, 2, 2, 0.92)';
+      ctx.fillRect(0, 0, 480, 320);
+      const hex = '#' + proj.color.toString(16).padStart(6, '0');
+      ctx.strokeStyle = hex; ctx.lineWidth = 2; ctx.strokeRect(2, 2, 476, 316);
+      // Scanlines
+      ctx.strokeStyle = 'rgba(255, 17, 0, 0.04)'; ctx.lineWidth = 1;
+      for (let sy = 0; sy < 320; sy += 4) { ctx.beginPath(); ctx.moveTo(0, sy); ctx.lineTo(480, sy); ctx.stroke(); }
+      ctx.fillStyle = hex; ctx.fillRect(0, 0, 480, 4);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 22px Courier New, monospace'; ctx.fillText(proj.title.toUpperCase(), 24, 50);
+      ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = '14px Courier New, monospace';
+      const words = proj.desc.split(' ');
+      let line = '', lineY = 85;
+      words.forEach(w => {
+        const test = line + w + ' ';
+        if (ctx.measureText(test).width > 430) { ctx.fillText(line, 24, lineY); line = w + ' '; lineY += 20; } else { line = test; }
+      });
+      ctx.fillText(line, 24, lineY);
+      ctx.fillStyle = hex; ctx.font = '11px Courier New, monospace';
+      let tx = 24;
+      proj.tech.forEach(t => { ctx.fillText(t.toUpperCase(), tx, 280); tx += ctx.measureText(t).width + 18; });
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      const cardGeo = new THREE.BoxGeometry(2.4, 1.6, 0.05);
+      const holoSide = createHoloMaterial({ borderColor: hex, opacity: 0.3 });
+      registerShaderTime(holoSide);
+      const frontMat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.3, metalness: 0.1, transparent: true });
+      addNeonRim(frontMat, new THREE.Color(proj.color), 2.0);
+      const mats = [holoSide, holoSide, holoSide, holoSide, frontMat, holoSide];
+      const mesh = new THREE.Mesh(cardGeo, mats);
+      mesh.position.set(Math.cos(angle) * radius, Y + yOffset, Math.sin(angle) * radius);
+      mesh.lookAt(0, Y + yOffset, 0); mesh.rotation.y += Math.PI;
+      mesh.userData.projIndex = i; mesh.userData.baseAngle = angle; mesh.userData.baseY = Y + yOffset;
+      g.add(mesh); cardMeshes.push(mesh);
+
+      const pl = new THREE.PointLight(proj.color, 0.8, 5, 2);
+      pl.position.copy(mesh.position); pl.position.z += 0.5;
+      g.add(pl);
+    });
+    g.userData.cardMeshes = cardMeshes;
+
+    // Energy beams to center
+    const lineGeo = new THREE.BufferGeometry();
+    const lp = [];
+    cardMeshes.forEach(m => { lp.push(0, Y, 0, m.position.x, m.position.y, m.position.z); });
+    lineGeo.setAttribute('position', new THREE.Float32BufferAttribute(lp, 3));
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xff1100, transparent: true, opacity: 0.3, blending: THREE.AdditiveBlending });
+    const lines = new THREE.LineSegments(lineGeo, lineMat);
+    g.add(lines);
+    g.userData.lines = lines;
+  }
+
+  sectionControllers[3] = {
+    update(local, elapsed, dt) {
+      if (!sectionInited[3]) return;
+      const g = sectionGroups[3];
+      const Y = -36;
+
+      const helixRot = local * Math.PI * 2;
+      const cards = g.userData.cardMeshes;
+      const radius = 4;
+      cards.forEach((mesh, i) => {
+        const angle = mesh.userData.baseAngle + helixRot;
+        mesh.position.x = Math.cos(angle) * radius;
+        mesh.position.z = Math.sin(angle) * radius;
+        mesh.lookAt(0, mesh.userData.baseY, 0); mesh.rotation.y += Math.PI;
+        if (mesh.material[0] && mesh.material[0].uniforms) mesh.material[0].uniforms.uTime.value = elapsed;
+        if (mesh.material[4] && mesh.material[4].userData.shader) mesh.material[4].userData.shader.uniforms.uTime.value = elapsed;
+      });
+
+      if (g.userData.orbMat) g.userData.orbMat.uniforms.uTime.value = elapsed;
+      if (g.userData.hudRings) g.userData.hudRings.forEach((ring, i) => { ring.rotation.z = elapsed * (0.05 + i * 0.03) * (i % 2 ? 1 : -1); });
+
+      const lp = g.userData.lines.geometry.attributes.position.array;
+      cards.forEach((mesh, i) => { lp[i*6+3] = mesh.position.x; lp[i*6+4] = mesh.position.y; lp[i*6+5] = mesh.position.z; });
+      g.userData.lines.geometry.attributes.position.needsUpdate = true;
+      g.userData.lines.material.opacity = 0.2 + Math.sin(elapsed * 2) * 0.1;
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION 4: STATS — "System Diagnostics"
+  // ═══════════════════════════════════════════════════════════════════════════
+  function initStats() {
+    const g = sectionGroups[4];
+    const Y = -48;
+
+    const amb = new THREE.AmbientLight(0x1a0a0a, 0.5);
+    g.add(amb);
+    const redAccent = new THREE.PointLight(0xff1100, 2, 20, 1.5);
+    redAccent.position.set(0, Y, 3);
+    g.add(redAccent);
+
+    // Circuit ground — grid floor + traces
+    const statsGrid = createGridFloor(Y - 2, 0xff1100);
+    g.add(statsGrid.mesh);
+    registerShaderTime(statsGrid.material);
+
+    // 5 Circular gauge arcs
+    const gauges = [];
+    STATS.forEach((stat, i) => {
+      const angle = ((i - 2) / 5) * Math.PI * 1.2;
+      const x = Math.sin(angle) * 3;
+      const z = Math.cos(angle) * 1.5;
+
+      // Ring background
+      const bgRingGeo = new THREE.TorusGeometry(0.6, 0.04, 8, 48);
+      const bgRingMat = new THREE.MeshBasicMaterial({
+        color: 0x330000, transparent: true, opacity: 0.3,
+      });
+      const bgRing = new THREE.Mesh(bgRingGeo, bgRingMat);
+      bgRing.position.set(x, Y, z);
+      bgRing.rotation.y = -angle;
+      g.add(bgRing);
+
+      // Active arc (partial ring)
+      const arcGeo = new THREE.TorusGeometry(0.6, 0.06, 8, 48, 0);
+      const arcMat = new THREE.MeshBasicMaterial({
+        color: 0xff1100, transparent: true, opacity: 0.8,
+        blending: THREE.AdditiveBlending,
+      });
+      const arc = new THREE.Mesh(arcGeo, arcMat);
+      arc.position.set(x, Y, z);
+      arc.rotation.y = -angle;
+      g.add(arc);
+
+      // Point light per gauge
+      const pl = new THREE.PointLight(0xff1100, 0.5, 3, 2);
+      pl.position.set(x, Y, z);
+      g.add(pl);
+
+      gauges.push({ arc, arcMat, bgRing, x, z, angle, light: pl, targetValue: stat.value, currentValue: 0 });
+    });
+    g.userData.gauges = gauges;
+
+    // Expanding pulse wave pool — 4 torus rings
+    const pulseWaves = [];
+    for (let i = 0; i < 4; i++) {
+      const pwGeo = new THREE.TorusGeometry(0.5, 0.02, 8, 48);
+      const pwMat = new THREE.MeshBasicMaterial({
+        color: 0xff1100, transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const pw = new THREE.Mesh(pwGeo, pwMat);
+      pw.position.set(0, Y, 0);
+      pw.rotation.x = Math.PI / 2;
+      g.add(pw);
+      pulseWaves.push({ mesh: pw, mat: pwMat, phase: i * 0.7, scale: 0.5 });
+    }
+    g.userData.pulseWaves = pulseWaves;
+
+    // Red data flow particles
+    const statsParticles = createGPUParticles({ count: Math.floor(300 * PARTICLE_SCALE), spread: 10, Y, color: 0xff1100, size: 2.0 });
+    g.add(statsParticles.points);
+    registerShaderTime(statsParticles.material);
+
+    g.userData.statsAnimated = false;
+  }
+
+  sectionControllers[4] = {
+    update(local, elapsed, dt) {
+      if (!sectionInited[4]) return;
+      const g = sectionGroups[4];
+      const Y = -48;
+
+      // Animate gauge arcs based on local progress
+      const gauges = g.userData.gauges;
+      const fillProgress = Math.min(local / 0.6, 1.0);
+      gauges.forEach((gauge, i) => {
+        const targetArc = fillProgress * Math.PI * 2 * 0.75;
+        // Recreate arc geometry at current fill
+        gauge.arc.geometry.dispose();
+        gauge.arc.geometry = new THREE.TorusGeometry(0.6, 0.06, 8, 48, targetArc);
+        gauge.light.intensity = 0.3 + fillProgress * 0.5 + Math.sin(elapsed * 1.5 + i) * 0.2;
+      });
+
+      // Animate stat counters in HTML
+      STATS.forEach((stat, i) => {
+        const currentVal = stat.value * fillProgress;
+        const el = document.getElementById(`stat-${i}`);
+        if (el) {
+          if (stat.suffix === '%') el.textContent = currentVal.toFixed(1) + stat.suffix;
+          else if (stat.suffix === 'ms') el.textContent = Math.round(currentVal) + stat.suffix;
+          else el.textContent = Math.round(currentVal) + stat.suffix;
+        }
+      });
+
+      // Expanding pulse waves
+      const pw = g.userData.pulseWaves;
+      pw.forEach((wave, i) => {
+        const t = (elapsed * 0.5 + wave.phase) % 2.0;
+        wave.scale = 0.5 + t * 3;
+        wave.mesh.scale.setScalar(wave.scale);
+        wave.mat.opacity = Math.max(0, 0.3 * (1 - t / 2.0));
+      });
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION 5: CONTACT — "Transmission"
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  let contactTextMesh = null;
+  function initContactText() {
+    if (!fontReady || contactTextMesh) return;
+    const g = sectionGroups[5];
+    const Y = -60;
+
+    const textGeo = new TextGeometry("TRANSMIT", {
+      font: fontReady, size: 0.8, depth: 0.2, curveSegments: 24,
+      bevelEnabled: true, bevelThickness: 0.025, bevelSize: 0.015, bevelSegments: 6,
+    });
+    textGeo.computeBoundingBox();
+    const bb = textGeo.boundingBox;
+    textGeo.translate(-(bb.min.x + (bb.max.x - bb.min.x)/2), -(bb.min.y + (bb.max.y - bb.min.y)/2), -(bb.min.z + (bb.max.z - bb.min.z)/2));
+
+    const textMat = createDarkChromeMaterial({ color: 0xffffff, rimColor: 0xff1100 });
+    textMat.envMapIntensity = 1.5;
+
+    contactTextMesh = new THREE.Mesh(textGeo, textMat);
+    contactTextMesh.position.set(0, Y + 1.2, 0);
+    contactTextMesh.castShadow = true;
+    g.add(contactTextMesh);
+  }
+
+  function initContact() {
+    const g = sectionGroups[5];
+    const Y = -60;
+
+    // Lighting
+    const mainSpot = new THREE.SpotLight(0xffffff, 6);
+    mainSpot.position.set(0, Y + 10, 3); mainSpot.angle = 0.25;
+    mainSpot.penumbra = 0.7; mainSpot.decay = 1.5; mainSpot.distance = 25;
+    mainSpot.castShadow = true; mainSpot.shadow.mapSize.set(1024, 1024);
+    mainSpot.target.position.set(0, Y, 0);
+    g.add(mainSpot); g.add(mainSpot.target);
+
+    const redSpot1 = new THREE.SpotLight(0xff1100, 3);
+    redSpot1.position.set(-5, Y + 6, 2); redSpot1.angle = 0.4; redSpot1.penumbra = 0.9;
+    redSpot1.decay = 2; redSpot1.distance = 20; redSpot1.target.position.set(0, Y, 0);
+    g.add(redSpot1); g.add(redSpot1.target);
+
+    const redSpot2 = new THREE.SpotLight(0xff2200, 3);
+    redSpot2.position.set(5, Y + 6, 2); redSpot2.angle = 0.4; redSpot2.penumbra = 0.9;
+    redSpot2.decay = 2; redSpot2.distance = 20; redSpot2.target.position.set(0, Y, 0);
+    g.add(redSpot2); g.add(redSpot2.target);
+
+    const amb = new THREE.AmbientLight(0x111111, 0.3);
+    g.add(amb);
+
+    // Red grid floor with radar pulse
+    const contactGrid = createGridFloor(Y - 2, 0xff1100);
+    g.add(contactGrid.mesh);
+    registerShaderTime(contactGrid.material);
+    g.userData.gridMat = contactGrid.material;
+
+    // Signal wave rings behind text
+    const signalWaves = [];
+    for (let i = 0; i < 3; i++) {
+      const swGeo = new THREE.TorusGeometry(1.0, 0.03, 8, 48);
+      const swMat = new THREE.MeshBasicMaterial({
+        color: 0xff1100, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false,
+      });
+      const sw = new THREE.Mesh(swGeo, swMat);
+      sw.position.set(0, Y + 1.2, -2);
+      g.add(sw);
+      signalWaves.push({ mesh: sw, mat: swMat, phase: i * 0.8 });
+    }
+    g.userData.signalWaves = signalWaves;
+
+    // Contact icon pods — 4 dark chrome boxes
+    const iconShapes = [
+      { color: 0xff1100, pos: [-2.5, Y + 0, 1.5], label: 'Email' },
+      { color: 0xff2200, pos: [-0.8, Y + 0, 2],   label: 'GitHub' },
+      { color: 0xcc0000, pos: [0.8, Y + 0, 2],    label: 'LinkedIn' },
+      { color: 0xff3300, pos: [2.5, Y + 0, 1.5],  label: 'Twitter' },
+    ];
+    const icons = [];
+    iconShapes.forEach((ic) => {
+      const holoMat = createHoloMaterial({
+        baseColor: '#0a0a0a', borderColor: '#' + ic.color.toString(16).padStart(6, '0'), scanSpeed: 1.0, opacity: 0.5,
+      });
+      registerShaderTime(holoMat);
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.06), holoMat);
+      mesh.position.set(...ic.pos);
+      g.add(mesh);
+      const pl = new THREE.PointLight(ic.color, 0.6, 4, 2);
+      pl.position.set(...ic.pos);
+      g.add(pl);
+      icons.push({ mesh, light: pl, baseY: ic.pos[1], holoMat, label: ic.label });
+    });
+    g.userData.icons = icons;
+
+    // Rising red motes
+    const moteCount = Math.floor(150 * PARTICLE_SCALE);
+    const moteGeo = new THREE.BufferGeometry();
+    const motePos = new Float32Array(moteCount * 3);
+    for (let i = 0; i < moteCount; i++) {
+      motePos[i*3] = (Math.random()-0.5)*12; motePos[i*3+1] = Y + (Math.random()-0.5)*10; motePos[i*3+2] = (Math.random()-0.5)*8;
+    }
+    moteGeo.setAttribute('position', new THREE.BufferAttribute(motePos, 3));
+    const moteMat = new THREE.PointsMaterial({
+      color: 0xff1100, size: 0.03, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false,
+    });
+    g.add(new THREE.Points(moteGeo, moteMat));
+    g.userData.particles = g.children[g.children.length - 1];
+
+    if (fontReady) initContactText();
+  }
+
+  sectionControllers[5] = {
+    update(local, elapsed, dt) {
+      if (!sectionInited[5]) return;
+      const g = sectionGroups[5];
+      const Y = -60;
+
+      // Glitch text position
+      if (contactTextMesh) {
+        contactTextMesh.rotation.y = Math.sin(elapsed * 0.1) * 0.08;
+        // Periodic glitch offset
+        const glitchActive = Math.sin(elapsed * 8) > 0.95;
+        contactTextMesh.position.x = glitchActive ? (Math.random() - 0.5) * 0.1 : 0;
+        if (contactTextMesh.material.userData.shader) {
+          contactTextMesh.material.userData.shader.uniforms.uTime.value = elapsed;
+        }
+      }
+
+      // Signal waves expanding
+      if (g.userData.signalWaves) {
+        g.userData.signalWaves.forEach((sw) => {
+          const t = (elapsed * 0.4 + sw.phase) % 2.0;
+          sw.mesh.scale.setScalar(1.0 + t * 2);
+          sw.mat.opacity = Math.max(0, 0.25 * (1 - t / 2.0));
+        });
+      }
+
+      // Float icon pods
+      if (g.userData.icons) {
+        g.userData.icons.forEach((ic, i) => {
+          if (!reducedMotion) ic.mesh.position.y = ic.baseY + Math.sin(elapsed * 0.5 + i * 1.5) * 0.15;
+          ic.light.intensity = 0.5 + Math.sin(elapsed * 1.2 + i * 2) * 0.2;
+          if (ic.holoMat && ic.holoMat.uniforms) ic.holoMat.uniforms.uTime.value = elapsed;
+        });
+      }
+
+      // Rising motes
+      if (!reducedMotion && g.userData.particles) {
+        const pp = g.userData.particles.geometry.attributes.position.array;
+        for (let i = 0; i < pp.length; i += 3) {
+          pp[i + 1] += dt * 0.2;
+          if (pp[i + 1] > Y + 5) pp[i + 1] = Y - 5;
+        }
+        g.userData.particles.geometry.attributes.position.needsUpdate = true;
+      }
+    },
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SECTION INIT DISPATCHER
+  // ═══════════════════════════════════════════════════════════════════════════
+  const initFunctions = [null, initAbout, initServices, initPortfolio, initStats, initContact];
+
+  function ensureSectionInited(index) {
+    if (index < 0 || index >= 6) return;
+    if (sectionInited[index]) return;
+    if (initFunctions[index]) {
+      initFunctions[index]();
+    }
+    sectionInited[index] = true;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SCROLL DRIVER
+  // ═══════════════════════════════════════════════════════════════════════════
+  let globalProgress = 0;
+
+  ScrollTrigger.create({
+    trigger: '#scroll-container',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: 3.5,
+    onUpdate: (self) => {
+      globalProgress = self.progress;
+    },
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MOUSE & RAYCASTER
+  // ═══════════════════════════════════════════════════════════════════════════
+  const mouse = { x: 0, y: 0 };
+  const parallax = { x: 0, y: 0 };
+  const mouseNDC = new THREE.Vector2();
+  const raycaster = new THREE.Raycaster();
+  let hoveredMesh = null;
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
+    mouseNDC.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouseNDC.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    _cursorX = e.clientX;
+    _cursorY = e.clientY;
+  });
+
+  window.addEventListener('click', (e) => {
+    if (!hoveredMesh) return;
+    const si = currentSectionIndex;
+
+    // Portfolio — show detail + card flip
+    if (si === 3 && hoveredMesh.userData.projIndex !== undefined) {
+      const proj = PORTFOLIO_ITEMS[hoveredMesh.userData.projIndex];
+      const detail = document.getElementById('project-detail');
+      document.getElementById('proj-title').textContent = proj.title;
+      document.getElementById('proj-desc').textContent = proj.desc;
+      const techEl = document.getElementById('proj-tech');
+      techEl.innerHTML = proj.tech.map(t => `<span>${t}</span>`).join('');
+      detail.classList.toggle('visible');
+      gsap.to(hoveredMesh.rotation, { y: hoveredMesh.rotation.y + Math.PI, duration: 0.6, ease: 'power2.inOut' });
+    }
+
+    // Contact — open links
+    if (si === 5 && sectionInited[5]) {
+      const icons = sectionGroups[5].userData.icons;
+      if (icons) {
+        const idx = icons.findIndex(ic => ic.mesh === hoveredMesh);
+        if (idx >= 0) {
+          const urls = [
+            'mailto:hello@NYRA Tech solutions.com',
+            'https://github.com/NYRA Tech solutions',
+            'https://linkedin.com/in/NYRA Tech solutions',
+            'https://twitter.com/NYRA Tech solutions',
+          ];
+          // Scale-down animation then open
+          gsap.to(hoveredMesh.scale, {
+            x: 0.9, y: 0.9, z: 0.9, duration: 0.15, ease: 'power2.in',
+            onComplete() {
+              gsap.to(hoveredMesh.scale, { x: 1, y: 1, z: 1, duration: 0.15 });
+              window.open(urls[idx], '_blank');
+            },
+          });
+        }
+      }
+    }
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // OVERLAY MANAGER
+  // ═══════════════════════════════════════════════════════════════════════════
+  const overlayEls = [
+    null, // hero uses subtitle
+    document.getElementById('about-overlay'),
+    document.getElementById('services-overlay'),
+    document.getElementById('portfolio-overlay'),
+    document.getElementById('stats-overlay'),
+    document.getElementById('contact-overlay'),
+  ];
+
+  function updateOverlays(sectionIndex, local) {
+    overlayEls.forEach((el, i) => {
+      if (!el) return;
+      if (i === sectionIndex) {
+        // Fade in 10-35%, full 35-80%, fade out 80-100%
+        let opacity = 1;
+        if (local < 0.10) opacity = 0;
+        else if (local < 0.35) opacity = (local - 0.10) / 0.25;
+        else if (local > 0.85) opacity = 1 - (local - 0.85) / 0.15;
+
+        el.style.opacity = opacity;
+        el.classList.toggle('active', opacity > 0.01);
+      } else {
+        el.style.opacity = 0;
+        el.classList.remove('active');
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NAV DOTS
+  // ═══════════════════════════════════════════════════════════════════════════
+  const navDots = document.querySelectorAll('.nav-dot');
+  navDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      const si = parseInt(dot.dataset.section);
+      const targetScroll = SECTIONS[si].start * (document.getElementById('scroll-container').offsetHeight - window.innerHeight);
+      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    });
+  });
+
+  function updateNavDots(index) {
+    navDots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // RESIZE
+  // ═══════════════════════════════════════════════════════════════════════════
+  let _resizeRaf = -1;
+  function onResize() {
+    const w = window.innerWidth, h = window.innerHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(w, h, false);
+    composer.setSize(w, h);
+    bloomPass.resolution.set(Math.floor(w/2), Math.floor(h/2));
+  }
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(_resizeRaf);
+    _resizeRaf = requestAnimationFrame(onResize);
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // VISIBILITY
+  // ═══════════════════════════════════════════════════════════════════════════
+  const clock = new THREE.Clock();
+  document.addEventListener('visibilitychange', () => {
+    document.hidden ? clock.stop() : clock.start();
+  });
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ADAPTIVE QUALITY
+  // ═══════════════════════════════════════════════════════════════════════════
+  let _fpsFrames = 0, _fpsTime = 0, _currentFps = 60;
+  let _qualityReduced = false;
+
+  function updateAdaptiveQuality(dt) {
+    _fpsFrames++;
+    _fpsTime += dt;
+    if (_fpsTime >= 1.0) {
+      _currentFps = _fpsFrames / _fpsTime;
+      _fpsFrames = 0;
+      _fpsTime = 0;
+
+      if (_currentFps < 30 && !_qualityReduced) {
+        _qualityReduced = true;
+        renderer.setPixelRatio(1);
+        composer.setSize(window.innerWidth, window.innerHeight);
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // ANIMATION LOOP
+  // ═══════════════════════════════════════════════════════════════════════════
+  const _camPos = new THREE.Vector3();
+  const _lookAt = new THREE.Vector3();
+  const _targetCamPos = new THREE.Vector3();
+  const _targetLookAt = new THREE.Vector3();
+  let _smoothProgress = 0;
+  let _prevT = 0;
+  let _rayFrame = 0; // throttled raycaster — every 2nd frame
+
+  // Section background colors — dark with red undertone
+  const SECTION_BG = [
+    [0.02, 0.005, 0.005],  // Hero
+    [0.03, 0.01, 0.01],    // About
+    [0.02, 0.005, 0.005],  // Services
+    [0.025, 0.008, 0.008], // Portfolio
+    [0.02, 0.01, 0.005],   // Stats
+    [0.015, 0.005, 0.005], // Contact
+  ];
+
+  // Section fog settings [color, density]
+  const SECTION_FOG = [
+    null,                                    // Hero — no fog
+    [new THREE.Color(0x0a0505), 0.04],       // About
+    [new THREE.Color(0x0a0505), 0.03],       // Services
+    [new THREE.Color(0x080505), 0.035],      // Portfolio
+    [new THREE.Color(0x0a0505), 0.04],       // Stats
+    null,                                    // Contact — no fog
+  ];
+
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (document.hidden) return;
+
+    const elapsed = clock.getElapsedTime();
+    const dt = Math.min(elapsed - _prevT, 0.05);
+    _prevT = elapsed;
+
+    // Smooth scroll progress
+    const kSmooth = 1.0 - Math.pow(0.94, dt * 60);
+    _smoothProgress += (globalProgress - _smoothProgress) * kSmooth;
+
+    const info = getSectionInfo(_smoothProgress);
+    const { index: si, local } = info;
+
+    // Section changed
+    if (si !== currentSectionIndex) {
+      // Camera shake on section entry
+      if (!reducedMotion) _shakeTimer = 0.4;
+      _prevSectionForShake = currentSectionIndex;
+      currentSectionIndex = si;
+      updateNavDots(si);
+
+      // Close project detail on section change
+      document.getElementById('project-detail').classList.remove('visible');
+
+      // Glitch burst on section transition
+      if (!reducedMotion && glitchPass) {
+        glitchPass.uniforms.uIntensity.value = 0.8;
+        gsap.to(glitchPass.uniforms.uIntensity, { value: SECTION_GLITCH[si] || 0.03, duration: 0.6, ease: 'power2.out' });
+      }
+    }
+
+    // Lazy init: current ± 1
+    for (let i = Math.max(0, si - 1); i <= Math.min(5, si + 1); i++) {
+      ensureSectionInited(i);
+    }
+
+    // Section visibility
+    for (let i = 0; i < 6; i++) {
+      sectionGroups[i].visible = (Math.abs(i - si) <= 1);
+    }
+
+    // ── Batch update all registered shader uTime uniforms ──
+    for (let i = 0; i < _shaderTimeUniforms.length; i++) {
+      _shaderTimeUniforms[i].value = elapsed;
+    }
+
+    // ── Camera spline ──
+    const splineT = Math.max(0, Math.min(1, _smoothProgress));
+    _targetCamPos.copy(cameraSpline.getPointAt(splineT));
+    _targetLookAt.copy(lookAtSpline.getPointAt(splineT));
+
+    // Mouse parallax
+    const kPx = 1.0 - Math.pow(0.96, dt * 60);
+    parallax.x += (mouse.x - parallax.x) * kPx;
+    parallax.y += (mouse.y - parallax.y) * kPx;
+
+    // Dolly drift
+    if (!reducedMotion) {
+      _targetCamPos.x += Math.sin(elapsed * 0.060) * 0.15 + parallax.x * 0.12;
+      _targetCamPos.y += Math.sin(elapsed * 0.040) * 0.08 + parallax.y * 0.08;
+      _targetCamPos.z += Math.sin(elapsed * 0.050) * 0.18;
+    } else {
+      _targetCamPos.x += parallax.x * 0.12;
+      _targetCamPos.y += parallax.y * 0.08;
+    }
+
+    // Hero section: apply orbit on top
+    if (si === 0) {
+      const smoothRotY = scroll.rotY || 0;
+      const r = _targetCamPos.z;
+      _targetCamPos.x = Math.sin(smoothRotY) * r + parallax.x * 0.14;
+      _targetCamPos.y = parallax.y * 0.10;
+      _targetCamPos.z = Math.cos(smoothRotY) * r;
+      if (!reducedMotion) {
+        _targetCamPos.x += Math.sin(elapsed * 0.060) * 0.18;
+        _targetCamPos.y += Math.sin(elapsed * 0.040) * 0.09;
+      }
+    }
+
+    // Services: slight orbit
+    if (si === 2 && !reducedMotion) {
+      _targetCamPos.x += Math.sin(elapsed * 0.03) * 0.5;
+    }
+
+    // Portfolio: orbital drift
+    if (si === 3 && !reducedMotion) {
+      _targetCamPos.x += Math.sin(local * Math.PI) * 1.5;
+    }
+
+    // Contact: slow camera push-in
+    if (si === 5 && !reducedMotion) {
+      _targetCamPos.z -= local * 1.5;
+    }
+
+    // Smooth camera movement
+    const kCam = 1.0 - Math.pow(0.93, dt * 60);
+    camera.position.lerp(_targetCamPos, kCam);
+    _lookAt.lerp(_targetLookAt, kCam);
+    camera.lookAt(_lookAt);
+
+    // ── FOV breathing ──
+    if (!reducedMotion) {
+      camera.fov = 45 + Math.sin(elapsed * 0.1) * 0.5;
+      camera.updateProjectionMatrix();
+    }
+
+    // ── Camera shake on section entry ──
+    if (_shakeTimer > 0 && !reducedMotion) {
+      _shakeTimer -= dt;
+      const shakeAmt = _shakeTimer * 0.18;
+      camera.position.x += (Math.random() - 0.5) * shakeAmt;
+      camera.position.y += (Math.random() - 0.5) * shakeAmt;
+    }
+
+    // ── Update current section controller ──
+    if (sectionControllers[si]) {
+      sectionControllers[si].update(local, elapsed, dt);
+    }
+
+    // ── Section background crossfade ──
+    const bg = SECTION_BG[si];
+    if (si === 0) {
+      const fade = local < 0.7 ? 0 : (local - 0.7) / 0.3;
+      scene.background.setRGB(fade * bg[0], fade * bg[1], fade * bg[2]);
+    } else {
+      scene.background.lerp(new THREE.Color(bg[0], bg[1], bg[2]), 0.05);
+    }
+
+    // ── Fog per section ──
+    const fogCfg = SECTION_FOG[si];
+    if (fogCfg) {
+      if (!scene.fog) scene.fog = new THREE.FogExp2(fogCfg[0], fogCfg[1]);
+      scene.fog.color.lerp(fogCfg[0], 0.05);
+      scene.fog.density += (fogCfg[1] - scene.fog.density) * 0.05;
+    } else {
+      if (scene.fog) scene.fog.density *= 0.95;
+      if (scene.fog && scene.fog.density < 0.001) scene.fog = null;
+    }
+
+    // ── Bloom per section ──
+    const targetBloom = SECTION_BLOOM[si];
+    bloomPass.strength += (targetBloom - bloomPass.strength) * 0.05;
+
+    // ── Overlays ──
+    updateOverlays(si, local);
+
+    // ── Custom cursor ──
+    cursorEl.style.left = _cursorX + 'px';
+    cursorEl.style.top = _cursorY + 'px';
+
+    // ── Raycaster (throttled — every 2nd frame, all sections) ──
+    _rayFrame++;
+    if (_rayFrame % 2 === 0) {
+      raycaster.setFromCamera(mouseNDC, camera);
+      let targets = [];
+
+      if (si === 0 && letterMeshes.length) {
+        targets = letterMeshes;
+      } else if (si === 1 && sectionInited[1]) {
+        targets = sectionGroups[1].userData.headMesh ? [sectionGroups[1].userData.headMesh] : [];
+      } else if (si === 2 && sectionInited[2]) {
+        targets = sectionGroups[2].userData.panelMeshes || [];
+      } else if (si === 3 && sectionInited[3]) {
+        targets = sectionGroups[3].userData.cardMeshes || [];
+      } else if (si === 4 && sectionInited[4]) {
+        targets = sectionGroups[4].userData.gauges ? sectionGroups[4].userData.gauges.map(g => g.arc) : [];
+      } else if (si === 5 && sectionInited[5]) {
+        targets = sectionGroups[5].userData.icons ? sectionGroups[5].userData.icons.map(ic => ic.mesh) : [];
+      }
+
+      if (targets.length > 0) {
+        const hits = raycaster.intersectObjects(targets);
+        if (hits.length > 0) {
+          const hit = hits[0].object;
+          if (hoveredMesh !== hit) {
+            // unhover old
+            if (hoveredMesh && hoveredMesh.material && !Array.isArray(hoveredMesh.material)) {
+              if (hoveredMesh.material.emissiveIntensity !== undefined) {
+                hoveredMesh.material.emissiveIntensity = hoveredMesh.userData.baseEmissive || 0;
+              }
+            }
+            hoveredMesh = hit;
+            cursorEl.classList.add('hover');
+          }
+          // hover effect
+          if (hit.material && !Array.isArray(hit.material) && hit.material.emissiveIntensity !== undefined) {
+            hit.material.emissiveIntensity = (hit.userData.baseEmissive || 0) + 0.8;
+          }
+        } else {
+          if (hoveredMesh) {
+            if (hoveredMesh.material && !Array.isArray(hoveredMesh.material) && hoveredMesh.material.emissiveIntensity !== undefined) {
+              hoveredMesh.material.emissiveIntensity = hoveredMesh.userData.baseEmissive || 0;
+            }
+            hoveredMesh = null;
+            cursorEl.classList.remove('hover');
+          }
+        }
+      } else {
+        if (hoveredMesh) {
+          if (hoveredMesh.material && !Array.isArray(hoveredMesh.material) && hoveredMesh.material.emissiveIntensity !== undefined) {
+            hoveredMesh.material.emissiveIntensity = hoveredMesh.userData.baseEmissive || 0;
+          }
+          hoveredMesh = null;
+          cursorEl.classList.remove('hover');
+        }
+      }
+    }
+
+    // ── Glitch + Bloom per section ──
+    if (!reducedMotion && glitchPass) {
+      glitchPass.uniforms.uTime.value = elapsed;
+      // Ambient glitch level per section
+      const targetGlitch = SECTION_GLITCH[si] || 0.03;
+      glitchPass.uniforms.uIntensity.value += (targetGlitch - glitchPass.uniforms.uIntensity.value) * 0.05;
+    }
+    composer.render();
+
+    // Adaptive quality
+    updateAdaptiveQuality(dt);
+  }
+
+  animate();
+</script>
+
+</body>
+</html>
